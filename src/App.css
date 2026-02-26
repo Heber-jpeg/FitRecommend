@@ -1,11 +1,95 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  background-color: burlywood;
 }
 
+ /* Personalizacion de la barra de navegacion*/
 .navbar {
-  background-color: #222;
+  background: linear-gradient(90deg, #111, #1f1f1f);
   color: white;
-  padding: 15px;
-  text-align: center;
+  padding: 18px 50px;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 30px;   /* Más grande */
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+  font-size: 20px;   /* Texto más grande */
+}
+
+.nav-links li {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-links li:hover {
+  color: #00bfff;
+}
+
+/* Fin DE LA BARRA DE NAVEGACION*/
+
+.form-container {
+  background: white;
+  width: 300px;
+  margin: 40px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.form-container input,
+.form-container select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.form-container button {
+  background-color: #0077ff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.form-container button:hover {
+  background-color: #005fcc;
+}
+
+.recomendaciones {
+  background: #005fcc;
+  width: 300px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.recomendaciones ul {
+  padding-left: 20px;
 }

@@ -1,7 +1,17 @@
+import { useState } from "react";
+
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <nav className="navbar">
-      <h1>FitRecommend 💪</h1>
+      <div className="logo">FitRecommend 💪</div>
+
+      <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
+        <li>Inicio</li>
+        <li>Rutinas</li>
+        <li>Perfil</li>
+      </ul>
     </nav>
   );
 }

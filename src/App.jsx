@@ -1,11 +1,17 @@
+import { useState } from 'react';
 import './App.css'
-import Navbar from './componentes/Navbar';
+import Navbar from './componentes/Navbar.jsx'
+import PerfilForm from './componentes/PerfilForm.jsx';
+import Recomendaciones from './componentes/Recomendaciones.jsx';
 
 function App() {
+  const [perfil, setPerfil] = useState(null);
   return (
     <>
-      <h1>FitRecommend 💪</h1>
-      <p>Sistema de recomendaciones de ejercicios</p>
+      <Navbar />
+      <PerfilForm setPerfil={setPerfil}/>
+      <Recomendaciones perfil={perfil} />
+      <p>Sistema de recomendaciones de ejercicios personalizados para principiantes o personas con experiencia</p>
     </>
   );
 }
