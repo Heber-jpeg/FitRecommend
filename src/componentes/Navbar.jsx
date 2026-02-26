@@ -1,16 +1,14 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
-function Navbar({ abrirPerfil }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-
+function Navbar() {
   return (
     <nav className="navbar">
       <div className="logo">FitRecommend 💪</div>
 
-      <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
-        <li>Inicio</li>
-        <li>Rutinas</li>
-        <li onClick={abrirPerfil}>Perfil</li>
+      <ul className="nav-links">
+        <li><Link to="/">Inicio</Link></li>
+        <li><Link to="/rutinas">Rutinas</Link></li>
+        <li><Link to="/perfil">Perfil</Link></li>
       </ul>
     </nav>
   );

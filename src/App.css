@@ -5,63 +5,33 @@ body {
 }
 
 /* Selecion de perfil */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  z-index: 2000;
+.perfil-container {
+  text-align: center;
+  margin-top: 40px;
 }
 
-/* Caja centrada */
-.modal {
-  background: white;
-  width: 350px;
-  padding: 25px;
-  border-radius: 12px;
+.perfil-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  animation: aparecer 0.3s ease;
+  gap: 15px;
+  max-width: 400px;
+  margin: 20px auto;
 }
 
-/* Animación */
-@keyframes aparecer {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.modal input,
-.modal select {
-  padding: 8px;
-  border-radius: 6px;
+.perfil-form input,
+.perfil-form select {
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid #ccc;
 }
 
-.modal button {
+.perfil-form button {
   padding: 10px;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #0077ff;
+  background-color: #2ecc71;
   color: white;
-}
-
-.modal .cerrar {
-  background: #444;
+  cursor: pointer;
 }
 /* Fin de selecion de perfil */
 
