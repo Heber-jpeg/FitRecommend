@@ -1,36 +1,26 @@
-import { useState } from "react";
-
-function PerfilForm({ setPerfil }) {
-  const [edad, setEdad] = useState("");
-  const [nivel, setNivel] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setPerfil({ edad, nivel });
-  };
-
+function PerfilForm({ cerrarPerfil }) {
   return (
-    <div className="form-container">
-      <h2>Ingresa tu perfil</h2>
+    <div className="modal-overlay">
+      <div className="modal">
+        <h2>Completa tu perfil</h2>
 
-      <input
-        type="number"
-        placeholder="Edad"
-        value={edad}
-        onChange={(e) => setEdad(e.target.value)}
-      />
+        <input type="text" placeholder="Nombre" />
+        <input type="number" placeholder="Edad" />
+        <input type="number" placeholder="Peso (kg)" />
+        <input type="number" placeholder="Altura (cm)" />
 
-      <select
-        value={nivel}
-        onChange={(e) => setNivel(e.target.value)}
-      >
-        <option value="">Selecciona tu nivel</option>
-        <option value="principiante">Principiante</option>
-        <option value="intermedio">Intermedio</option>
-        <option value="avanzado">Avanzado</option>
-      </select>
+        <select>
+          <option>Selecciona objetivo</option>
+          <option>Bajar peso</option>
+          <option>Ganar músculo</option>
+          <option>Mantener forma</option>
+        </select>
 
-      <button onClick={handleSubmit}>Generar rutina</button>
+        <button>Guardar</button>
+        <button className="cerrar" onClick={cerrarPerfil}>
+          Cerrar
+        </button>
+      </div>
     </div>
   );
 }

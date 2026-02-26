@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Navbar() {
+function Navbar({ abrirPerfil }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -10,7 +10,7 @@ function Navbar() {
       <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
         <li>Inicio</li>
         <li>Rutinas</li>
-        <li>Perfil</li>
+        <li onClick={abrirPerfil}>Perfil</li>
       </ul>
     </nav>
   );
