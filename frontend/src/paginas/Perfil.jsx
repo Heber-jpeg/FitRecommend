@@ -3,6 +3,8 @@ import { useState } from "react";
 function Perfil() {
   const [nombre, setNombre] = useState("");
   const [edad, setEdad] = useState("");
+  const [peso, setPeso] = useState("");
+  const [altura, setAltura] = useState("");
   const [objetivo, setObjetivo] = useState("");
 
   const handleSubmit = (e) => {
@@ -11,6 +13,8 @@ function Perfil() {
     const perfil = {
       nombre,
       edad,
+      peso,
+      altura,
       objetivo,
     };
 
@@ -40,6 +44,22 @@ function Perfil() {
           required
         />
 
+        <input 
+           type="number"
+           placeholder="Peso(kg)"
+           value={peso}
+           onChange={(e) => setPeso(e.target.value)}
+           required
+        />
+
+        <input
+           type="number"
+           placeholder="Altura(cm)"
+           value={altura}
+           onChange={(e) => setAltura(e.target.value)}
+           required
+        />
+
         <select
           value={objetivo}
           onChange={(e) => setObjetivo(e.target.value)}
@@ -48,7 +68,7 @@ function Perfil() {
           <option value="">Selecciona tu objetivo</option>
           <option value="musculo">Ganar músculo</option>
           <option value="perder_grasa">Perder grasa</option>
-          <option value="resistencia">Resistencia</option>
+          <option value="resistencia">Ganar resistencia</option>
         </select>
 
         <button type="submit">Guardar Perfil</button>
