@@ -7,7 +7,7 @@ function Perfil() {
   const [altura, setAltura] = useState("");
   const [objetivo, setObjetivo] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const perfil = {
@@ -18,10 +18,25 @@ function Perfil() {
       objetivo,
     };
 
-    console.log("Perfil guardado:", perfil);
+      try {
+      const respuesta = await fetch("http://localhost:5173/perfil", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(perfil),
+      });
 
-    alert("Perfil guardado correctamente");
+      const data = await respuesta.json();
+      console.log(data);
+      alert("Perfil enviado al backend");
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
+
+  
 
   return (
     <div className="perfil-container">
@@ -75,6 +90,7 @@ function Perfil() {
       </form>
     </div>
   );
+  
 }
 
 export default Perfil;
