@@ -19,13 +19,14 @@ function Perfil() {
     };
 
       try {
-      const respuesta = await fetch("http://localhost:5173/perfil", {
+      const respuesta = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(perfil),
       });
+      
 
       const data = await respuesta.json();
       console.log(data);

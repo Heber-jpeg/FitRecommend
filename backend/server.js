@@ -16,7 +16,7 @@ app.listen(PORT, () => {
 
 
 
-//prueba manueal de ollama(esto no va aqui)
+/*prueba manueal de ollama(esto no va aqui)
 const axios = require("axios");
 
 async function test() {
@@ -24,7 +24,7 @@ async function test() {
     "http://localhost:11434/api/generate",
     {
       model: "llama3",
-      prompt: "Crea una rutina de fuerza",
+      prompt: "puedes saludar y presentate por favor",
       stream: false
     }
   );
@@ -33,3 +33,5 @@ async function test() {
 }
 
 test();
+
+*/

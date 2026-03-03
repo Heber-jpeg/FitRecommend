@@ -4,12 +4,30 @@
  * @brief:      Controlador encargado de generar rutinas utilizando la API local de Ollama
  * @author:     Jesus Rojas
  * @date:       25-02-2026
-*/
+ */
+
 const axios = require("axios");
 
 const generateRoutine = async (req, res) => {
   try {
-    const { prompt } = req.body;
+
+    const { nombre, edad, peso, altura, objetivo } = req.body;
+
+    // Validación robusta del body
+    if ( !nombre || !edad || !peso || !altura || !objetivo ) {
+      return res.status(400).json({
+        error: "Datos incompletos"
+      });
+    }
+
+    const prompt = `
+
+    Hola llama, ni mobre es ${nombre}, tengo ${edad} años, peso ${peso} kg
+    mi altura es ${altura} cm y mi objetivo es ${objetivo}, genera una rutina
+    que se adapte a mis caracteristicas fisicas
+    `;
+
+    
 
     const response = await axios.post(
       "http://localhost:11434/api/generate",
@@ -17,13 +35,25 @@ const generateRoutine = async (req, res) => {
         model: "llama3",
         prompt: prompt,
         stream: false
+      },
+      {
+        timeout: 30000 // evita que quede colgado indefinidamente
       }
     );
 
-    res.json(response.data);
+    // Devolver solo el texto generado
+    return res.status(200).json({
+      response: response.data.response
+    });
+    
+    console.log(response);
+
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ error: "Error communicating with Ollama" });
+    console.error("Error al comunicarse con Ollama:", error.message);
+
+    return res.status(500).json({
+      error: "Error al comunicarse con el servicio de generación"
+    });
   }
 };
 
