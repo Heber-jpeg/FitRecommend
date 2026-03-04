@@ -11,10 +11,10 @@ const axios = require("axios");
 const generateRoutine = async (req, res) => {
   try {
 
-    const { nombre, edad, peso, altura, objetivo } = req.body;
+    const { nombre, edad, peso, altura, objetivo, nivel, dias, lesiones } = req.body;
 
     // Validación robusta del body
-    if ( !nombre || !edad || !peso || !altura || !objetivo ) {
+    if ( !nombre || !edad || !peso || !altura || !objetivo || !nivel || !dias || !lesiones ) {
       return res.status(400).json({
         error: "Datos incompletos"
       });
@@ -22,9 +22,13 @@ const generateRoutine = async (req, res) => {
 
     const prompt = `
 
-    Hola llama, ni mobre es ${nombre}, tengo ${edad} años, peso ${peso} kg
-    mi altura es ${altura} cm y mi objetivo es ${objetivo}, genera una rutina
-    que se adapte a mis caracteristicas fisicas
+    lesiones: ${lesiones}
+
+    Hola ollama, mi mobre es ${nombre}, tengo ${edad} años, peso ${peso} kg
+    mi altura es ${altura} cm y mi objetivo es ${objetivo}, ten en cuenta que
+    soy nivel ${nivel} tambien ten en cuenta si tengo lesiones previas, genera
+    una rutina de ${dias} por semana que se adapte a mis caracteristicas fisicas
+    y a mis objetivos
     `;
 
     
