@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function Rutinas() {
-  const [rutina, setRutina] = useState(() => {
-    const rutinaGuardada = localStorage.getItem("rutinaGenerada");
-    return rutinaGuardada ? JSON.parse(rutinaGuardada) : null;
-  });
+  const [rutina, setRutina] = useState(null);
 
   const generarRutina = () => {
     const rutinaGuardada = localStorage.getItem("rutinaGenerada");
@@ -21,21 +18,19 @@ function Rutinas() {
     <div className="rutina-container">
       <h2>Rutinas recomendadas</h2>
 
-      {!rutina && (
-        <button onClick={generarRutina}>
-          Generar Rutina
-        </button>
-      )}
+      <button onClick={generarRutina} className="btn-generar">
+        Generar Rutina
+      </button>
 
       {rutina && (
-       <div className="rutina-box">
-       <h3>Tu rutina personalizada</h3>
+        <div className="rutina-box">
+          <h3>Tu rutina personalizada</h3>
 
-    <div className="rutina-texto">
-      {rutina.response}
-    </div>
-    </div>
-    )}
+          <div className="rutina-texto">
+            {rutina.response}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

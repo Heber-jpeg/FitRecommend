@@ -6,72 +6,80 @@ function Perfil() {
   const [peso, setPeso] = useState("");
   const [altura, setAltura] = useState("");
   const [objetivo, setObjetivo] = useState("");
+  const [nivel, setNivel] = useState("");
+  const [dias, setDias] = useState("");
+  const [lesiones, setLesiones] = useState("");
   const [guardado, setGuardado] = useState(false);
 
-  // 🔥 Cargar datos al entrar al componente
+  // 🔥 Cargar datos guardados
   useEffect(() => {
     const perfilGuardado = localStorage.getItem("perfil");
 
     if (perfilGuardado) {
       const datos = JSON.parse(perfilGuardado);
 
-      setNombre(datos.nombre);
-      setEdad(datos.edad);
-      setPeso(datos.peso);
-      setAltura(datos.altura);
-      setObjetivo(datos.objetivo);
+      setNombre(datos.nombre || "");
+      setEdad(datos.edad || "");
+      setPeso(datos.peso || "");
+      setAltura(datos.altura || "");
+      setObjetivo(datos.objetivo || "");
+      setNivel(datos.nivel || "");
+      setDias(datos.dias || "");
+      setLesiones(datos.lesiones || "");
       setGuardado(true);
     }
   }, []);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Si está en modo guardado → pasar a modo edición
-  if (guardado) {
-    setGuardado(false);
-    return;
-  }
+    if (guardado) {
+      setGuardado(false);
+      return;
+    }
 
-  const perfil = {
-    nombre,
-    edad,
-    peso,
-    altura,
-    objetivo,
+    const perfil = {
+      nombre,
+      edad,
+      peso,
+      altura,
+      objetivo,
+      nivel,
+      dias,
+      lesiones,
+    };
+
+    try {
+      const respuesta = await fetch("http://localhost:3000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(perfil),
+      });
+
+      const data = await respuesta.json();
+
+      // Guardar perfil actualizado
+      localStorage.setItem("perfil", JSON.stringify(perfil));
+
+      // Guardar nueva rutina generada
+      localStorage.setItem("rutinaGenerada", JSON.stringify(data));
+
+      alert("Perfil actualizado y rutina regenerada ✅");
+      setGuardado(true);
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
-
-  try {
-    const respuesta = await fetch("http://localhost:3000/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(perfil),
-    });
-
-    const data = await respuesta.json();
-
-    // 🔥 Guardar perfil actualizado
-    localStorage.setItem("perfil", JSON.stringify(perfil));
-
-    // 🔥 Sobrescribir rutina anterior (regenerar)
-    localStorage.setItem("rutinaGenerada", JSON.stringify(data));
-
-    alert("Perfil actualizado y rutina regenerada ✅");
-
-    setGuardado(true);
-
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
 
   return (
     <div className="perfil-container">
       <h2>Completa tu perfil</h2>
 
       <form onSubmit={handleSubmit} className="perfil-form">
+
         <input
           type="text"
           placeholder="Nombre"
@@ -120,9 +128,43 @@ function Perfil() {
           <option value="resistencia">Ganar resistencia</option>
         </select>
 
+        {/* 🔥 NUEVOS CAMPOS */}
+
+        <select
+          value={nivel}
+          onChange={(e) => setNivel(e.target.value)}
+          required
+          disabled={guardado}
+        >
+          <option value="">Nivel de experiencia</option>
+          <option value="principiante">Principiante</option>
+          <option value="intermedio">Intermedio</option>
+          <option value="avanzado">Avanzado</option>
+        </select>
+
+        <input
+          type="number"
+          placeholder="Días disponibles por semana (1-7)"
+          value={dias}
+          onChange={(e) =>setDias(e.target.value)}
+          required
+          disabled={guardado}
+          min="1"
+          max="7"
+        />
+
+        <input
+          type="text"
+          placeholder="¿Tienes alguna lesión o limitación?"
+          value={lesiones}
+          onChange={(e) => setLesiones(e.target.value)}
+          disabled={guardado}
+        />
+
         <button type="submit">
           {guardado ? "Editar Perfil" : "Guardar Perfil"}
         </button>
+
       </form>
     </div>
   );
