@@ -37,7 +37,7 @@ const generateRoutine = async (req, res) => {
         stream: false
       },
       {
-        timeout: 30000 // evita que quede colgado indefinidamente
+        timeout: 3000000 // evita que quede colgado indefinidamente
       }
     );
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Perfil() {
   const [nombre, setNombre] = useState("");
@@ -6,9 +6,32 @@ function Perfil() {
   const [peso, setPeso] = useState("");
   const [altura, setAltura] = useState("");
   const [objetivo, setObjetivo] = useState("");
+  const [guardado, setGuardado] = useState(false);
+
+  // 🔥 Cargar datos al entrar al componente
+  useEffect(() => {
+    const perfilGuardado = localStorage.getItem("perfil");
+
+    if (perfilGuardado) {
+      const datos = JSON.parse(perfilGuardado);
+
+      setNombre(datos.nombre);
+      setEdad(datos.edad);
+      setPeso(datos.peso);
+      setAltura(datos.altura);
+      setObjetivo(datos.objetivo);
+      setGuardado(true);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Si ya está guardado → activar edición
+    if (guardado) {
+      setGuardado(false);
+      return;
+    }
 
     const perfil = {
       nombre,
@@ -18,7 +41,7 @@ function Perfil() {
       objetivo,
     };
 
-      try {
+    try {
       const respuesta = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
         headers: {
@@ -26,18 +49,22 @@ function Perfil() {
         },
         body: JSON.stringify(perfil),
       });
-      
 
       const data = await respuesta.json();
-      console.log(data);
-      alert("Perfil enviado al backend");
+
+      // 🔥 Guardar perfil
+      localStorage.setItem("perfil", JSON.stringify(perfil));
+
+      // 🔥 Guardar rutina generada por backend
+      localStorage.setItem("rutinaGenerada", JSON.stringify(data));
+
+      alert("Perfil guardado correctamente ✅");
+      setGuardado(true);
 
     } catch (error) {
       console.error("Error:", error);
     }
   };
-
-  
 
   return (
     <div className="perfil-container">
@@ -50,6 +77,7 @@ function Perfil() {
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
+          disabled={guardado}
         />
 
         <input
@@ -58,28 +86,32 @@ function Perfil() {
           value={edad}
           onChange={(e) => setEdad(e.target.value)}
           required
-        />
-
-        <input 
-           type="number"
-           placeholder="Peso(kg)"
-           value={peso}
-           onChange={(e) => setPeso(e.target.value)}
-           required
+          disabled={guardado}
         />
 
         <input
-           type="number"
-           placeholder="Altura(cm)"
-           value={altura}
-           onChange={(e) => setAltura(e.target.value)}
-           required
+          type="number"
+          placeholder="Peso (kg)"
+          value={peso}
+          onChange={(e) => setPeso(e.target.value)}
+          required
+          disabled={guardado}
+        />
+
+        <input
+          type="number"
+          placeholder="Altura (cm)"
+          value={altura}
+          onChange={(e) => setAltura(e.target.value)}
+          required
+          disabled={guardado}
         />
 
         <select
           value={objetivo}
           onChange={(e) => setObjetivo(e.target.value)}
           required
+          disabled={guardado}
         >
           <option value="">Selecciona tu objetivo</option>
           <option value="musculo">Ganar músculo</option>
@@ -87,11 +119,12 @@ function Perfil() {
           <option value="resistencia">Ganar resistencia</option>
         </select>
 
-        <button type="submit">Guardar Perfil</button>
+        <button type="submit">
+          {guardado ? "Editar Perfil" : "Guardar Perfil"}
+        </button>
       </form>
     </div>
   );
-  
 }
 
 export default Perfil;

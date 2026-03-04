@@ -107,3 +107,18 @@ body {
 .form-container button:hover {
   background-color: #005fcc;
 }
+
+.rutina-container {
+  text-align: center;
+}
+
+.rutina-box {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.rutina-dia {
+  margin: 8px 0;
+}
