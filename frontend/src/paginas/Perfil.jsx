@@ -25,46 +25,47 @@ function Perfil() {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Si ya está guardado → activar edición
-    if (guardado) {
-      setGuardado(false);
-      return;
-    }
+  // Si está en modo guardado → pasar a modo edición
+  if (guardado) {
+    setGuardado(false);
+    return;
+  }
 
-    const perfil = {
-      nombre,
-      edad,
-      peso,
-      altura,
-      objetivo,
-    };
-
-    try {
-      const respuesta = await fetch("http://localhost:3000/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(perfil),
-      });
-
-      const data = await respuesta.json();
-
-      // 🔥 Guardar perfil
-      localStorage.setItem("perfil", JSON.stringify(perfil));
-
-      // 🔥 Guardar rutina generada por backend
-      localStorage.setItem("rutinaGenerada", JSON.stringify(data));
-
-      alert("Perfil guardado correctamente ✅");
-      setGuardado(true);
-
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const perfil = {
+    nombre,
+    edad,
+    peso,
+    altura,
+    objetivo,
   };
+
+  try {
+    const respuesta = await fetch("http://localhost:3000/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(perfil),
+    });
+
+    const data = await respuesta.json();
+
+    // 🔥 Guardar perfil actualizado
+    localStorage.setItem("perfil", JSON.stringify(perfil));
+
+    // 🔥 Sobrescribir rutina anterior (regenerar)
+    localStorage.setItem("rutinaGenerada", JSON.stringify(data));
+
+    alert("Perfil actualizado y rutina regenerada ✅");
+
+    setGuardado(true);
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 
   return (
     <div className="perfil-container">

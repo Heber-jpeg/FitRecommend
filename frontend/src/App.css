@@ -108,6 +108,8 @@ body {
   background-color: #005fcc;
 }
 
+/* RUTINA VENTANA */
+
 .rutina-container {
   text-align: center;
 }
@@ -115,10 +117,33 @@ body {
 .rutina-box {
   margin-top: 20px;
   padding: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   border-radius: 10px;
 }
 
 .rutina-dia {
   margin: 8px 0;
+}
+
+.rutina-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.rutina-box {
+  margin-top: 20px;
+  width: 80%;
+  max-width: 1000px;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: #5529298c;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.rutina-texto {
+  text-align: left;
+  white-space: pre-line; /* 🔥 respeta los saltos de línea */
+  line-height: 1.5;
 }

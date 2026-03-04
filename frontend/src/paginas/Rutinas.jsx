@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Rutinas() {
-  const [rutina, setRutina] = useState(null);
+  const [rutina, setRutina] = useState(() => {
+    const rutinaGuardada = localStorage.getItem("rutinaGenerada");
+    return rutinaGuardada ? JSON.parse(rutinaGuardada) : null;
+  });
 
   const generarRutina = () => {
     const rutinaGuardada = localStorage.getItem("rutinaGenerada");
@@ -18,26 +21,21 @@ function Rutinas() {
     <div className="rutina-container">
       <h2>Rutinas recomendadas</h2>
 
-      <button onClick={generarRutina}>
-        Generar Rutina
-      </button>
+      {!rutina && (
+        <button onClick={generarRutina}>
+          Generar Rutina
+        </button>
+      )}
 
       {rutina && (
-        <div className="rutina-box">
-          <h3>Tu rutina personalizada</h3>
+       <div className="rutina-box">
+       <h3>Tu rutina personalizada</h3>
 
-          {/* Si el backend devuelve un objeto con plan */}
-          {rutina.plan ? (
-            rutina.plan.map((dia, index) => (
-              <div key={index} className="rutina-dia">
-                <strong>{dia.dia}:</strong> {dia.ejercicio}
-              </div>
-            ))
-          ) : (
-            <pre>{JSON.stringify(rutina, null, 2)}</pre>
-          )}
-        </div>
-      )}
+    <div className="rutina-texto">
+      {rutina.response}
+    </div>
+    </div>
+    )}
     </div>
   );
 }
