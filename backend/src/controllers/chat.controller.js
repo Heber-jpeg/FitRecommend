@@ -29,6 +29,20 @@ const generateRoutine = async (req, res) => {
     soy nivel ${nivel} tambien ten en cuenta si tengo lesiones previas, genera
     una rutina de ${dias} por semana que se adapte a mis caracteristicas fisicas
     y a mis objetivos
+
+    Responde SOLO en JSON con este formato:
+
+    {
+    "rutina":[
+      {
+        "dia":"Día 1",
+        "titulo":"grupo muscular",
+        "ejercicios":[
+          "ejercicio - series x repeticiones"
+        ]
+      }
+    ]
+    }
     `;
 
     
