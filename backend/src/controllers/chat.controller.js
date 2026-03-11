@@ -22,27 +22,71 @@ const generateRoutine = async (req, res) => {
 
     const prompt = `
 
+    Genera una rutina de entrenamiento semanal personalizada.
+
+    Datos del usuario:
+
+    nombre: ${nombre}
+    edad: ${edad}
+    peso: ${peso} kg
+    altura: ${altura} cm
+    nivel: ${nivel}
+    objetivo: ${objetivo}
     lesiones: ${lesiones}
+    dias_entrenamiento: ${dias}
 
-    Hola ollama, mi mobre es ${nombre}, tengo ${edad} años, peso ${peso} kg
-    mi altura es ${altura} cm y mi objetivo es ${objetivo}, ten en cuenta que
-    soy nivel ${nivel} tambien ten en cuenta si tengo lesiones previas, genera
-    una rutina de ${dias} por semana que se adapte a mis caracteristicas fisicas
-    y a mis objetivos
+    Reglas obligatorias:
 
-    Responde SOLO en JSON con este formato:
+    1. La rutina debe contener EXACTAMENTE 7 objetos (uno por cada día).
+    2. Los días deben aparecer en este orden exacto:
+
+    Lunes
+    Martes
+    Miercoles
+    Jueves
+    Viernes
+    Sabado
+    Domingo
+
+    3. Solo ${dias} días deben ser de entrenamiento.
+    4. Los demás días deben ser descanso.
+    5. Si el día es entrenamiento:
+      - Debe incluir "titulo" con el grupo muscular trabajado.
+      - Debe incluir entre 3 y 5 ejercicios.
+    6. Cada ejercicio debe tener este formato:
+      "nombre ejercicio - series x repeticiones"
+
+    Ejemplo:
+    "Sentadilla - 3x10"
+
+    7. Si el día es descanso:
+      - solo incluye:
+      {
+        "dia": "Martes",
+        "titulo": "Descanso"
+      }
+
+    8. Considera el nivel, objetivo y lesiones.
+
+    Responde SOLO con JSON válido.
+
+    Formato exacto:
 
     {
-    "rutina":[
-      {
-        "dia":"Día 1",
-        "titulo":"grupo muscular",
-        "ejercicios":[
-          "ejercicio - series x repeticiones"
-        ]
-      }
-    ]
+      "rutina":[
+        {
+          "dia":"Lunes",
+          "titulo":"grupo muscular",
+          "ejercicios":[
+            "ejercicio - 3x10"
+          ]
+        }
+      ]
     }
+
+    NO escribas explicaciones.
+    NO escribas texto fuera del JSON.
+
     `;
 
     
