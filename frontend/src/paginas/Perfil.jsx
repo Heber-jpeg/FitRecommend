@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import ".//css/Perfil.css";
 
 function Perfil() {
+
   const [nombre, setNombre] = useState("");
   const [edad, setEdad] = useState("");
   const [peso, setPeso] = useState("");
@@ -10,13 +10,15 @@ function Perfil() {
   const [nivel, setNivel] = useState("");
   const [dias, setDias] = useState("");
   const [lesiones, setLesiones] = useState("");
+
   const [guardado, setGuardado] = useState(false);
 
-  // 🔥 Cargar datos guardados
   useEffect(() => {
+
     const perfilGuardado = localStorage.getItem("perfil");
 
     if (perfilGuardado) {
+
       const datos = JSON.parse(perfilGuardado);
 
       setNombre(datos.nombre || "");
@@ -27,11 +29,14 @@ function Perfil() {
       setNivel(datos.nivel || "");
       setDias(datos.dias || "");
       setLesiones(datos.lesiones || "");
+
       setGuardado(true);
     }
+
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
+
     e.preventDefault();
 
     if (guardado) {
@@ -47,37 +52,19 @@ function Perfil() {
       objetivo,
       nivel,
       dias,
-      lesiones,
+      lesiones
     };
 
-    try {
-      const respuesta = await fetch("http://localhost:3000/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(perfil),
-      });
+    localStorage.setItem("perfil", JSON.stringify(perfil));
 
-      const data = await respuesta.json();
-      console.log(data);
+    alert("Perfil guardado correctamente");
 
-      // Guardar perfil actualizado
-      localStorage.setItem("perfil", JSON.stringify(perfil));
-
-      // Guardar nueva rutina generada
-      localStorage.setItem("rutinaGenerada", JSON.stringify(data));
-
-      alert("Perfil actualizado y rutina regenerada ✅");
-      setGuardado(true);
-
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    setGuardado(true);
   };
 
   return (
     <div className="perfil-container">
+
       <h2>Completa tu perfil</h2>
 
       <form onSubmit={handleSubmit} className="perfil-form">
@@ -87,8 +74,8 @@ function Perfil() {
           placeholder="Nombre"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
-          required
           disabled={guardado}
+          required
         />
 
         <input
@@ -96,8 +83,8 @@ function Perfil() {
           placeholder="Edad"
           value={edad}
           onChange={(e) => setEdad(e.target.value)}
-          required
           disabled={guardado}
+          required
         />
 
         <input
@@ -105,8 +92,8 @@ function Perfil() {
           placeholder="Peso (kg)"
           value={peso}
           onChange={(e) => setPeso(e.target.value)}
-          required
           disabled={guardado}
+          required
         />
 
         <input
@@ -114,31 +101,29 @@ function Perfil() {
           placeholder="Altura (cm)"
           value={altura}
           onChange={(e) => setAltura(e.target.value)}
-          required
           disabled={guardado}
+          required
         />
 
         <select
           value={objetivo}
           onChange={(e) => setObjetivo(e.target.value)}
-          required
           disabled={guardado}
+          required
         >
           <option value="">Selecciona tu objetivo</option>
           <option value="musculo">Ganar músculo</option>
           <option value="perder_grasa">Perder grasa</option>
-          <option value="resistencia">Ganar resistencia</option>
+          <option value="resistencia">Resistencia</option>
         </select>
-
-        {/* 🔥 NUEVOS CAMPOS */}
 
         <select
           value={nivel}
           onChange={(e) => setNivel(e.target.value)}
-          required
           disabled={guardado}
+          required
         >
-          <option value="">Nivel de experiencia</option>
+          <option value="">Nivel</option>
           <option value="principiante">Principiante</option>
           <option value="intermedio">Intermedio</option>
           <option value="avanzado">Avanzado</option>
@@ -146,25 +131,25 @@ function Perfil() {
 
         <input
           type="number"
-          placeholder="Días disponibles por semana (1-7)"
+          placeholder="Días disponibles por semana"
           value={dias}
-          onChange={(e) =>setDias(e.target.value)}
-          required
+          onChange={(e) => setDias(e.target.value)}
           disabled={guardado}
           min="1"
           max="7"
+          required
         />
 
         <input
           type="text"
-          placeholder="¿Tienes alguna lesión o limitación?"
+          placeholder="Lesiones o limitaciones"
           value={lesiones}
           onChange={(e) => setLesiones(e.target.value)}
           disabled={guardado}
         />
 
         <button type="submit">
-          {guardado ? "Editar Perfil" : "Guardar Perfil"}
+          {guardado ? "Editar perfil" : "Guardar perfil"}
         </button>
 
       </form>
