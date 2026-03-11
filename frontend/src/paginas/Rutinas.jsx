@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./css/Rutinas.css"
 
 function Rutinas() {
   const [rutina, setRutina] = useState(null);

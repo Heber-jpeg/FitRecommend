@@ -1,0 +1,93 @@
+/* CONTENEDOR PRINCIPAL */
+.rutina-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+  background: #0F172A;
+  color: #F8FAFC;
+}
+
+/* TITULO */
+.rutina-container h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  letter-spacing: 0.5px;
+}
+
+/* BOTON GENERAR */
+.btn-generar {
+  background: #3B82F6;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* HOVER BOTON */
+.btn-generar:hover {
+  background: #2563EB;
+  transform: translateY(-1px);
+}
+
+/* CAJA DE RUTINA */
+.rutina-box {
+  margin-top: 40px;
+  width: 650px;
+  max-width: 90%;
+
+  background: #1E293B;
+  border-radius: 12px;
+  padding: 30px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* SUBTITULO */
+.rutina-box h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* TEXTO DE LA RUTINA */
+.rutina-texto {
+  background: #0F172A;
+  border: 1px solid #334155;
+
+  border-radius: 8px;
+  padding: 20px;
+
+  font-size: 14px;
+  line-height: 1.6;
+
+  color: #E2E8F0;
+
+  white-space: pre-line;
+}
+
+/* SCROLL SI EL TEXTO ES MUY LARGO */
+.rutina-texto {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* SCROLLBAR MINIMALISTA */
+.rutina-texto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rutina-texto::-webkit-scrollbar-thumb {
+  background: #3B82F6;
+  border-radius: 10px;
+}
+
+.rutina-texto::-webkit-scrollbar-track {
+  background: transparent;
+}

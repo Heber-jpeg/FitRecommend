@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ".//css/Perfil.css";
 
 function Perfil() {
   const [nombre, setNombre] = useState("");
@@ -59,6 +60,7 @@ function Perfil() {
       });
 
       const data = await respuesta.json();
+      console.log(data);
 
       // Guardar perfil actualizado
       localStorage.setItem("perfil", JSON.stringify(perfil));
