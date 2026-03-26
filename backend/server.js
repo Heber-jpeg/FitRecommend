@@ -13,25 +13,3 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
-
-
-
-/*prueba manueal de ollama(esto no va aqui)
-const axios = require("axios");
-
-async function test() {
-  const response = await axios.post(
-    "http://localhost:11434/api/generate",
-    {
-      model: "llama3",
-      prompt: "puedes saludar y presentate por favor",
-      stream: false
-    }
-  );
-
-  console.log(response.data.response);
-}
-
-test();
-
-*/

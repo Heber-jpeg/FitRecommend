@@ -27,21 +27,18 @@ function Rutinas() {
         body: perfil
       });
 
+      if (!res.ok) {
+        throw new Error("Error en el servidor");
+      }
+
       const data = await res.json();
 
-      // extraer el JSON del texto
-      const texto = data.response;
-
-      const inicio = texto.indexOf("{");
-      const fin = texto.lastIndexOf("}") + 1;
-
-      const jsonRutina = JSON.parse(texto.slice(inicio, fin));
-
-      setRutina(jsonRutina.rutina);
+      // 🔥 YA ES JSON LIMPIO
+      setRutina(data.rutina);
 
       localStorage.setItem(
         "rutinaGenerada",
-        JSON.stringify(jsonRutina)
+        JSON.stringify(data)
       );
 
     } catch (error) {

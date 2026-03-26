@@ -8,113 +8,206 @@
 
 const axios = require("axios");
 
+// 🔧 1. Crear plantilla fija (tú controlas estructura)
+const crearPlantilla = () => {
+  const dias = [
+    "Lunes",
+    "Martes",
+    "Miercoles",
+    "Jueves",
+    "Viernes",
+    "Sabado",
+    "Domingo"
+  ];
+
+  return dias.map(dia => ({
+    dia,
+    titulo: "",
+    ejercicios: []
+  }));
+};
+
+// 🔧 2. Limpiar respuesta IA
+const limpiarTexto = (texto) => {
+  return texto
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+};
+
+// 🔧 3. Integrar respuesta IA con plantilla (tolerante)
+const integrarRutina = (plantilla, respuestaIA, diasEntrenamiento) => {
+
+  if (!Array.isArray(respuestaIA)) {
+    console.log("❌ IA no devolvió array");
+    return null;
+  }
+
+  let entrenamientosUsados = 0;
+
+  return plantilla.map((dia, i) => {
+
+    const ia = respuestaIA[i];
+
+    // si no hay dato → descanso
+    if (!ia) {
+      return {
+        dia: dia.dia,
+        titulo: "Descanso"
+      };
+    }
+
+    // si ya usamos suficientes días de entrenamiento
+    if (entrenamientosUsados >= diasEntrenamiento) {
+      return {
+        dia: dia.dia,
+        titulo: "Descanso"
+      };
+    }
+
+    // descanso explícito
+    if (ia.titulo === "Descanso") {
+      return {
+        dia: dia.dia,
+        titulo: "Descanso"
+      };
+    }
+
+    // validar ejercicios
+    let ejercicios = Array.isArray(ia.ejercicios)
+      ? ia.ejercicios.filter(e => typeof e === "string")
+      : [];
+
+    // corregir cantidad
+    
+
+    if (ejercicios.length > 5) {
+      ejercicios = ejercicios.slice(0, 5);
+    }
+
+    entrenamientosUsados++;
+
+    return {
+      dia: dia.dia,
+      titulo: ia.titulo || "Entrenamiento",
+      ejercicios
+    };
+  });
+};
+
+// 🔧 4. Controller principal
 const generateRoutine = async (req, res) => {
   try {
 
     const { nombre, edad, peso, altura, objetivo, nivel, dias, lesiones } = req.body;
 
-    // Validación robusta del body
-    if ( !nombre || !edad || !peso || !altura || !objetivo || !nivel || !dias || !lesiones ) {
-      return res.status(400).json({
-        error: "Datos incompletos"
+    // 🔴 Validación entrada
+    if (
+      typeof nombre !== "string" ||
+      typeof objetivo !== "string" ||
+      typeof nivel !== "string" ||
+      typeof lesiones !== "string" ||
+      isNaN(edad) || edad <= 0 ||
+      isNaN(peso) || peso <= 0 ||
+      isNaN(altura) || altura <= 0 ||
+      isNaN(dias) || dias < 1 || dias > 7
+    ) {
+      return res.status(400).json({ error: "Datos inválidos" });
+    }
+
+    const plantilla = crearPlantilla();
+
+    const prompt = `
+    Devuelve SOLO un ARRAY JSON de 7 elementos.
+
+    Cada elemento debe tener:
+    - "titulo"
+    - "ejercicios" (solo si no es descanso)
+
+    Reglas:
+    - EXACTAMENTE ${dias} días de entrenamiento
+    - resto descanso
+    - 3 a 5 ejercicios por día
+    - formato: "Ejercicio - 3x10"
+
+    NO devuelvas objeto, SOLO array.
+    NO texto adicional.
+
+    Ejemplo:
+    [
+      {
+        "titulo": "Pecho",
+        "ejercicios": ["Press banca - 3x10"]
+      },
+      {
+        "titulo": "Descanso"
+      }
+    ]
+
+    Datos:
+    nombre:${nombre}
+    edad:${edad}
+    peso:${peso}
+    altura:${altura}
+    nivel:${nivel}
+    objetivo:${objetivo}
+    lesiones:${lesiones}
+    `;
+
+    let parsed = null;
+
+    // 🔁 Reintentos
+    for (let i = 0; i < 3; i++) {
+
+      try {
+
+        const response = await axios.post(
+          "http://localhost:11434/api/generate",
+          {
+            model: "llama3",
+            prompt,
+            stream: false
+          }
+        );
+
+        const raw = response.data.response;
+        console.log("RAW IA:", raw);
+
+        const limpio = limpiarTexto(raw);
+
+        try {
+          parsed = JSON.parse(limpio);
+          break;
+        } catch (e) {
+          console.log("❌ error parseando:", e.message);
+        }
+
+      } catch (err) {
+        console.log("❌ error en petición:", err.message);
+      }
+    }
+
+    if (!parsed) {
+      return res.status(500).json({
+        error: "La IA no devolvió un formato válido"
       });
     }
 
-    const prompt = `
+    const rutinaFinal = integrarRutina(plantilla, parsed, dias);
 
-    Genera una rutina de entrenamiento semanal personalizada.
-
-    Datos del usuario:
-
-    nombre: ${nombre}
-    edad: ${edad}
-    peso: ${peso} kg
-    altura: ${altura} cm
-    nivel: ${nivel}
-    objetivo: ${objetivo}
-    lesiones: ${lesiones}
-    dias_entrenamiento: ${dias}
-
-    Reglas obligatorias:
-
-    1. La rutina debe contener EXACTAMENTE 7 objetos (uno por cada día).
-    2. Los días deben aparecer en este orden exacto:
-
-    Lunes
-    Martes
-    Miercoles
-    Jueves
-    Viernes
-    Sabado
-    Domingo
-
-    3. Solo ${dias} días deben ser de entrenamiento.
-    4. Los demás días deben ser descanso.
-    5. Si el día es entrenamiento:
-      - Debe incluir "titulo" con el grupo muscular trabajado.
-      - Debe incluir entre 3 y 5 ejercicios.
-    6. Cada ejercicio debe tener este formato:
-      "nombre ejercicio - series x repeticiones"
-
-    Ejemplo:
-    "Sentadilla - 3x10"
-
-    7. Si el día es descanso:
-      - solo incluye:
-      {
-        "dia": "Martes",
-        "titulo": "Descanso"
-      }
-
-    8. Considera el nivel, objetivo y lesiones.
-
-    Responde SOLO con JSON válido.
-
-    Formato exacto:
-
-    {
-      "rutina":[
-        {
-          "dia":"Lunes",
-          "titulo":"grupo muscular",
-          "ejercicios":[
-            "ejercicio - 3x10"
-          ]
-        }
-      ]
+    if (!rutinaFinal) {
+      return res.status(500).json({
+        error: "No se pudo construir la rutina"
+      });
     }
 
-    NO escribas explicaciones.
-    NO escribas texto fuera del JSON.
-
-    `;
-
-    
-
-    const response = await axios.post(
-      "http://localhost:11434/api/generate",
-      {
-        model: "llama3",
-        prompt: prompt,
-        stream: false
-      },
-      {
-        timeout: 3000000 // evita que quede colgado indefinidamente
-      }
-    );
-
-    // Devolver solo el texto generado
-    return res.status(200).json({
-      response: response.data.response
-    });
-    
-    console.log(response);
+    // ✔️ respuesta final consistente
+    return res.json({ rutina: rutinaFinal });
 
   } catch (error) {
-    console.error("Error al comunicarse con Ollama:", error.message);
-
+    console.error("❌ error general:", error.message);
     return res.status(500).json({
-      error: "Error al comunicarse con el servicio de generación"
+      error: "Error interno del servidor"
     });
   }
 };
