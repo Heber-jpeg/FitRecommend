@@ -33,7 +33,6 @@ function Rutinas() {
 
       const data = await res.json();
 
-      // 🔥 YA ES JSON LIMPIO
       setRutina(data.rutina);
 
       localStorage.setItem(
@@ -71,58 +70,56 @@ function Rutinas() {
   return (
     <div className="rutina-container">
 
-      <h2>Rutina semanal</h2>
+      <h2>Rutina mensual</h2>
 
       <div className="botones-rutina">
-
-        <button onClick={generarRutina}>
-          Generar rutina
-        </button>
-
-        <button onClick={verRutinaGuardada}>
-          Ver rutina guardada
-        </button>
-
+        <button onClick={generarRutina}>Generar rutina</button>
+        <button onClick={verRutinaGuardada}>Ver rutina guardada</button>
       </div>
 
       {loading && <p className="generando">Generando rutina...</p>}
 
+      {/* 🔥 ENCABEZADO CALENDARIO */}
       {rutina && !loading && (
+        <>
+          <div className="calendar-header">
+            {["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map((d, i) => (
+              <div key={i} className="day-header">{d}</div>
+            ))}
+          </div>
 
-        <div className="calendar-grid">
+          <div className="calendar-grid">
 
-          {rutina.map((dia, index) => (
+            {rutina.map((dia, index) => (
 
-            <div className="day-card" key={index}>
+              <div
+                className={`day-card ${!dia.ejercicios ? "rest-day" : ""}`}
+                key={index}
+              >
 
-              <h3>{dia.dia}</h3>
+                <h3>Día {index + 1}</h3>
+                <h4>{dia.titulo}</h4>
 
-              <h4>{dia.titulo}</h4>
+                {dia.ejercicios ? (
 
-              {dia.ejercicios ? (
+                  <ul>
+                    {dia.ejercicios.map((ej, i) => (
+                      <li key={i}>{ej}</li>
+                    ))}
+                  </ul>
 
-                <ul>
+                ) : (
 
-                  {dia.ejercicios.map((ej, i) => (
-                    <li key={i}>{ej}</li>
-                  ))}
+                  <p className="descanso">Descanso</p>
 
-                </ul>
+                )}
 
-              ) : (
+              </div>
 
-                <p className="descanso">
-                  Día de descanso
-                </p>
+            ))}
 
-              )}
-
-            </div>
-
-          ))}
-
-        </div>
-
+          </div>
+        </>
       )}
 
     </div>

@@ -10,21 +10,22 @@ const axios = require("axios");
 
 // 🔧 1. Crear plantilla fija (tú controlas estructura)
 const crearPlantilla = () => {
-  const dias = [
-    "Lunes",
-    "Martes",
-    "Miercoles",
-    "Jueves",
-    "Viernes",
-    "Sabado",
-    "Domingo"
+  const diasSemana = [
+    "Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"
   ];
 
-  return dias.map(dia => ({
-    dia,
-    titulo: "",
-    ejercicios: []
-  }));
+  const plantilla = [];
+
+  for (let i = 0; i < 30; i++) {
+    plantilla.push({
+      dia: `Día ${i + 1}`,
+      nombreDia: diasSemana[i % 7],
+      titulo: "",
+      ejercicios: []
+    });
+  }
+
+  return plantilla;
 };
 
 // 🔧 2. Limpiar respuesta IA
@@ -47,9 +48,9 @@ const integrarRutina = (plantilla, respuestaIA, diasEntrenamiento) => {
 
   return plantilla.map((dia, i) => {
 
-    const ia = respuestaIA[i];
+    // 🔁 usamos módulo para repetir semana
+    const ia = respuestaIA[i % 7];
 
-    // si no hay dato → descanso
     if (!ia) {
       return {
         dia: dia.dia,
@@ -57,15 +58,6 @@ const integrarRutina = (plantilla, respuestaIA, diasEntrenamiento) => {
       };
     }
 
-    // si ya usamos suficientes días de entrenamiento
-    if (entrenamientosUsados >= diasEntrenamiento) {
-      return {
-        dia: dia.dia,
-        titulo: "Descanso"
-      };
-    }
-
-    // descanso explícito
     if (ia.titulo === "Descanso") {
       return {
         dia: dia.dia,
@@ -73,19 +65,13 @@ const integrarRutina = (plantilla, respuestaIA, diasEntrenamiento) => {
       };
     }
 
-    // validar ejercicios
     let ejercicios = Array.isArray(ia.ejercicios)
       ? ia.ejercicios.filter(e => typeof e === "string")
       : [];
 
-    // corregir cantidad
-    
-
     if (ejercicios.length > 5) {
       ejercicios = ejercicios.slice(0, 5);
     }
-
-    entrenamientosUsados++;
 
     return {
       dia: dia.dia,
@@ -117,42 +103,42 @@ const generateRoutine = async (req, res) => {
 
     const plantilla = crearPlantilla();
 
-    const prompt = `
-    Devuelve SOLO un ARRAY JSON de 7 elementos.
+ const prompt = `
+Devuelve SOLO un ARRAY JSON de 7 elementos.
 
-    Cada elemento debe tener:
-    - "titulo"
-    - "ejercicios" (solo si no es descanso)
+Cada elemento debe tener:
+- "titulo"
+- "ejercicios" (solo si no es descanso)
 
-    Reglas:
-    - EXACTAMENTE ${dias} días de entrenamiento
-    - resto descanso
-    - 3 a 5 ejercicios por día
-    - formato: "Ejercicio - 3x10"
+Reglas:
+- EXACTAMENTE ${dias} días de entrenamiento
+- resto descanso
+- 3 a 5 ejercicios por día
+- formato: "Ejercicio - 3x10"
 
-    NO devuelvas objeto, SOLO array.
-    NO texto adicional.
+NO devuelvas objeto, SOLO array.
+NO texto adicional.
 
-    Ejemplo:
-    [
-      {
-        "titulo": "Pecho",
-        "ejercicios": ["Press banca - 3x10"]
-      },
-      {
-        "titulo": "Descanso"
-      }
-    ]
+Ejemplo:
+[
+  {
+    "titulo": "Pecho",
+    "ejercicios": ["Press banca - 3x10"]
+  },
+  {
+    "titulo": "Descanso"
+  }
+]
 
-    Datos:
-    nombre:${nombre}
-    edad:${edad}
-    peso:${peso}
-    altura:${altura}
-    nivel:${nivel}
-    objetivo:${objetivo}
-    lesiones:${lesiones}
-    `;
+Datos:
+nombre:${nombre}
+edad:${edad}
+peso:${peso}
+altura:${altura}
+nivel:${nivel}
+objetivo:${objetivo}
+lesiones:${lesiones}
+`;
 
     let parsed = null;
 
