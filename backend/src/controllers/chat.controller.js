@@ -104,40 +104,79 @@ const generateRoutine = async (req, res) => {
     const plantilla = crearPlantilla();
 
  const prompt = `
-Devuelve SOLO un ARRAY JSON de 7 elementos.
+Tu única tarea es devolver un ARRAY JSON válido.
 
-Cada elemento debe tener:
-- "titulo"
-- "ejercicios" (solo si no es descanso)
+NO expliques nada.
+NO agregues texto antes o después.
+NO uses markdown.
+NO uses comentarios.
+
+La salida DEBE poder ejecutarse directamente con JSON.parse sin errores.
+
+---
+
+FORMATO OBLIGATORIO:
+
+- La salida debe comenzar con: [
+- La salida debe terminar con: ]
+
+- Debe contener EXACTAMENTE 7 objetos (índice 0 a 6)
+- NO devuelvas un objeto, SOLO un array
+- NO agregues claves extra
+
+---
+
+ESTRUCTURA DE CADA ELEMENTO:
+
+Día de entrenamiento:
+{
+  "titulo": "nombre del grupo muscular",
+  "ejercicios": [
+    "Ejercicio - 3x10"
+  ]
+}
 
 Reglas:
-- EXACTAMENTE ${dias} días de entrenamiento
-- resto descanso
-- 3 a 5 ejercicios por día
-- formato: "Ejercicio - 3x10"
+- "ejercicios" debe tener ENTRE 3 Y 5 elementos
+- Cada elemento debe ser string
+- Formato exacto: "Texto - NxM"
 
-NO devuelvas objeto, SOLO array.
-NO texto adicional.
+Día de descanso:
+{
+  "titulo": "Descanso"
+}
 
-Ejemplo:
-[
-  {
-    "titulo": "Pecho",
-    "ejercicios": ["Press banca - 3x10"]
-  },
-  {
-    "titulo": "Descanso"
-  }
-]
+Reglas:
+- NO incluir "ejercicios"
 
-Datos:
-nombre:${nombre}
-edad:${edad}
-peso:${peso}
-altura:${altura}
-nivel:${nivel}
-objetivo:${objetivo}
-lesiones:${lesiones}
+---
+
+REGLAS GLOBALES:
+
+- EXACTAMENTE ${dias} elementos deben ser entrenamiento
+- Los demás deben ser "Descanso"
+- NO mezclar descanso con ejercicios
+- NO usar null, undefined, ni valores vacíos
+- NO usar comas finales (trailing commas)
+
+---
+
+SI NO PUEDES CUMPLIR EXACTAMENTE TODAS LAS REGLAS:
+
+Devuelve exactamente:
+[]
+
+---
+
+DATOS DEL USUARIO:
+
+nombre: ${nombre}
+edad: ${edad}
+peso: ${peso}
+altura: ${altura}
+nivel: ${nivel}
+objetivo: ${objetivo}
+lesiones: ${lesiones}
 `;
 
     let parsed = null;
