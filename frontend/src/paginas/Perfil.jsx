@@ -1,6 +1,7 @@
+import "../paginas/css/Perfil.css";
 import { useState, useEffect } from "react";
 
-function Perfil() {
+function Perfil({ onGuardado }) {
 
   const [nombre, setNombre] = useState("");
   const [edad, setEdad] = useState("");
@@ -10,17 +11,12 @@ function Perfil() {
   const [nivel, setNivel] = useState("");
   const [dias, setDias] = useState("");
   const [lesiones, setLesiones] = useState("");
-
   const [guardado, setGuardado] = useState(false);
 
   useEffect(() => {
-
     const perfilGuardado = localStorage.getItem("perfil");
-
     if (perfilGuardado) {
-
       const datos = JSON.parse(perfilGuardado);
-
       setNombre(datos.nombre || "");
       setEdad(datos.edad || "");
       setPeso(datos.peso || "");
@@ -29,14 +25,11 @@ function Perfil() {
       setNivel(datos.nivel || "");
       setDias(datos.dias || "");
       setLesiones(datos.lesiones || "");
-
       setGuardado(true);
     }
-
   }, []);
 
   const handleSubmit = (e) => {
-
     e.preventDefault();
 
     if (guardado) {
@@ -52,21 +45,20 @@ function Perfil() {
       objetivo,
       nivel,
       dias,
-      lesiones
+      lesiones,
+      fechaInicio: new Date().toISOString().split("T")[0]
     };
 
     localStorage.setItem("perfil", JSON.stringify(perfil));
-
-    alert("Perfil guardado correctamente");
-
     setGuardado(true);
+
+    // ✅ Avisar al padre que se guardó
+    if (onGuardado) onGuardado(perfil);
   };
 
   return (
     <div className="perfil-container">
-
       <h2>Completa tu perfil</h2>
-
       <form onSubmit={handleSubmit} className="perfil-form">
 
         <input
@@ -77,7 +69,6 @@ function Perfil() {
           disabled={guardado}
           required
         />
-
         <input
           type="number"
           placeholder="Edad"
@@ -86,7 +77,6 @@ function Perfil() {
           disabled={guardado}
           required
         />
-
         <input
           type="number"
           placeholder="Peso (kg)"
@@ -95,7 +85,6 @@ function Perfil() {
           disabled={guardado}
           required
         />
-
         <input
           type="number"
           placeholder="Altura (cm)"
@@ -139,7 +128,6 @@ function Perfil() {
           max="7"
           required
         />
-
         <input
           type="text"
           placeholder="Lesiones o limitaciones"

@@ -4,6 +4,8 @@ import Layout from "./componentes/Layout";
 import Inicio from "./paginas/Inicio";
 import Perfil from "./paginas/Perfil";
 import Rutinas from "./paginas/Rutinas";
+import Calendario from "./paginas/Calendario";
+
 
 function App() {
   return (
@@ -13,6 +15,7 @@ function App() {
           <Route index element={<Inicio />} />
           <Route path="perfil" element={<Perfil />} />
           <Route path="rutinas" element={<Rutinas />} />
+          <Route path="calendario" element={<Calendario />} />
         </Route>
       </Routes>
     </BrowserRouter>

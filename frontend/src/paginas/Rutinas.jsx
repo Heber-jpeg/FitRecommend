@@ -1,127 +1,145 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./css/Rutinas.css";
 
 function Rutinas() {
 
-  const [rutina, setRutina] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [exito, setExito] = useState(false);
+
+  const navigate = useNavigate();
+
+  const [opciones, setOpciones] = useState({
+    descanso: "60",
+    duracion: "45",
+    intensidad: "moderada",
+    equipamiento: "gimnasio"
+  });
+
+  const handleOpciones = (e) => {
+    setOpciones({ ...opciones, [e.target.name]: e.target.value });
+  };
 
   const generarRutina = async () => {
-
-    const perfil = localStorage.getItem("perfil");
-
-    if (!perfil) {
+    const perfilRaw = localStorage.getItem("perfil");
+    if (!perfilRaw) {
       alert("Primero debes completar tu perfil");
       return;
     }
-
+    const p = JSON.parse(perfilRaw);
+    const body = {
+      nombre:       p.nombre,
+      edad:         Number(p.edad),
+      peso:         Number(p.peso),
+      altura:       Number(p.altura),
+      objetivo:     p.objetivo,
+      nivel:        p.nivel,
+      dias:         Number(p.dias),
+      lesiones:     p.lesiones || "",
+      fechaInicio:  p.fechaInicio || new Date().toISOString().split("T")[0],
+      descanso:     opciones.descanso,
+      duracion:     opciones.duracion,
+      intensidad:   opciones.intensidad,
+      equipamiento: opciones.equipamiento
+    };
     try {
-
       setLoading(true);
-
+      setExito(false);
       const res = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: perfil
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
       });
-
-      if (!res.ok) {
-        throw new Error("Error en el servidor");
-      }
-
+      if (!res.ok) throw new Error("Error en el servidor");
       const data = await res.json();
-
-      setRutina(data.rutina);
-
-      localStorage.setItem(
-        "rutinaGenerada",
-        JSON.stringify(data)
-      );
-
+      localStorage.setItem("rutinaGenerada", JSON.stringify(data));
+      setExito(true);
     } catch (error) {
-
       console.error(error);
-
+      alert("Error generando la rutina");
     } finally {
-
       setLoading(false);
-
     }
-
-  };
-
-  const verRutinaGuardada = () => {
-
-    const guardada = localStorage.getItem("rutinaGenerada");
-
-    if (!guardada) {
-      alert("No hay rutina guardada");
-      return;
-    }
-
-    const data = JSON.parse(guardada);
-
-    setRutina(data.rutina);
-
   };
 
   return (
     <div className="rutina-container">
+      <main className="rutina-main">
 
-      <h2>Rutina mensual</h2>
+        <h2>Personaliza tu rutina</h2>
 
-      <div className="botones-rutina">
-        <button onClick={generarRutina}>Generar rutina</button>
-        <button onClick={verRutinaGuardada}>Ver rutina guardada</button>
-      </div>
+        <div className="opciones-form">
 
-      {loading && <p className="generando">Generando rutina...</p>}
+          <div className="opciones-grid">
 
-      {/* 🔥 ENCABEZADO CALENDARIO */}
-      {rutina && !loading && (
-        <>
-          <div className="calendar-header">
-            {["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map((d, i) => (
-              <div key={i} className="day-header">{d}</div>
-            ))}
+            <div className="opcion-grupo">
+              <label>⏱ Descanso entre series</label>
+              <select name="descanso" value={opciones.descanso} onChange={handleOpciones}>
+                <option value="30">30 segundos</option>
+                <option value="60">1 minuto</option>
+                <option value="90">1:30 minutos</option>
+                <option value="120">2 minutos</option>
+                <option value="180">3 minutos</option>
+              </select>
+            </div>
+
+            <div className="opcion-grupo">
+              <label>🕐 Duración de sesión</label>
+              <select name="duracion" value={opciones.duracion} onChange={handleOpciones}>
+                <option value="30">30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">1 hora</option>
+                <option value="75">1:15 horas</option>
+                <option value="90">1:30 horas</option>
+              </select>
+            </div>
+
+            <div className="opcion-grupo">
+              <label>🔥 Intensidad (RPE)</label>
+              <select name="intensidad" value={opciones.intensidad} onChange={handleOpciones}>
+                <option value="baja">Baja — RPE 4-5</option>
+                <option value="moderada">Moderada — RPE 6-7</option>
+                <option value="alta">Alta — RPE 8-9</option>
+                <option value="maxima">Máxima — RPE 10</option>
+              </select>
+            </div>
+
+            <div className="opcion-grupo">
+              <label>🏋️ Equipamiento</label>
+              <select name="equipamiento" value={opciones.equipamiento} onChange={handleOpciones}>
+                <option value="gimnasio">Gimnasio completo</option>
+                <option value="casa">En casa sin equipo</option>
+                <option value="mancuernas">Mancuernas</option>
+                <option value="bandas">Bandas elásticas</option>
+                <option value="calistenia">Calistenia</option>
+              </select>
+            </div>
+
           </div>
 
-          <div className="calendar-grid">
-
-            {rutina.map((dia, index) => (
-
-              <div
-                className={`day-card ${!dia.ejercicios ? "rest-day" : ""}`}
-                key={index}
-              >
-
-                <h3>Día {index + 1}</h3>
-                <h4>{dia.titulo}</h4>
-
-                {dia.ejercicios ? (
-
-                  <ul>
-                    {dia.ejercicios.map((ej, i) => (
-                      <li key={i}>{ej}</li>
-                    ))}
-                  </ul>
-
-                ) : (
-
-                  <p className="descanso">Descanso</p>
-
-                )}
-
-              </div>
-
-            ))}
-
+          <div className="botones-rutina">
+            <button className="btn-generar" onClick={generarRutina} disabled={loading}>
+              {loading ? "Generando..." : "⚡ Generar rutina"}
+            </button>
           </div>
-        </>
-      )}
 
+        </div>
+
+        {loading && <p className="generando">Generando rutina, esto puede tardar unos segundos...</p>}
+
+        {/* MENSAJE DE ÉXITO */}
+        {exito && !loading && (
+          <div className="exito-card">
+            <span className="exito-icono">✅</span>
+            <h3>¡Rutina generada con éxito!</h3>
+            <p>Tu rutina mensual está lista. Puedes verla en el calendario.</p>
+            <button className="btn-generar" onClick={() => navigate("/calendario")}>
+              📅 Ver mi rutina
+            </button>
+          </div>
+        )}
+
+      </main>
     </div>
   );
 }

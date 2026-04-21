@@ -1,0 +1,279 @@
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  min-height: 100%;
+
+  background: #1E293B;
+  border-right: 1px solid #1E3A5F;
+  border-radius: 0 12px 12px 0;
+
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 12px;
+
+  position: static;
+  top: 80px;
+}
+
+/* SECCIÓN */
+.sidebar-seccion {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-left: 8px;
+  margin: 0;
+}
+
+/* DIVIDER */
+.sidebar-divider {
+  height: 1px;
+  background: #334155;
+  margin: 4px 0;
+}
+
+/* BOTONES */
+.sidebar-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-btn:hover {
+  background: #0F172A;
+  color: #F8FAFC;
+}
+
+.sidebar-btn.active {
+  background: #1D3B6E;
+  color: #60A5FA;
+}
+
+.sidebar-btn.danger {
+  color: #F87171;
+}
+
+.sidebar-btn.danger:hover {
+  background: #1F0F0F;
+  color: #FCA5A5;
+}
+
+/* TARJETA PERFIL */
+.sidebar-perfil-card {
+  background: #0F172A;
+  border: 1px solid #1E3A5F;
+  border-radius: 10px;
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-perfil-card:hover {
+  border-color: #3B82F6;
+  background: #0F1F3D;
+}
+
+.sidebar-perfil-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  background: #1D3B6E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #60A5FA;
+}
+
+.sidebar-perfil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar-perfil-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: #F8FAFC;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-perfil-nivel {
+  font-size: 11px;
+  color: #60A5FA;
+  text-transform: capitalize;
+}
+
+.sidebar-perfil-objetivo {
+  font-size: 11px;
+  color: #475569;
+}
+
+.sidebar-perfil-edit {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.sidebar-perfil-vacio {
+  color: #475569;
+  font-size: 13px;
+  justify-content: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-radius: 0;
+    border-right: none;
+    border-bottom: 1px solid #1E3A5F;
+    position: static;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .sidebar-seccion {
+    display: none;
+  }
+
+  .sidebar-perfil-card {
+    flex: 1;
+    min-width: 160px;
+  }
+}
+/* TARJETA DE PERFIL EN SIDEBAR */
+.sidebar-perfil-card {
+  background: #0F172A;
+  border: 1px solid #1E3A5F;
+  border-radius: 10px;
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.sidebar-perfil-card:hover {
+  border-color: #3B82F6;
+  background: #0F1F3D;
+}
+
+.sidebar-perfil-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  background: #1D3B6E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #60A5FA;
+}
+
+.sidebar-perfil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar-perfil-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: #F8FAFC;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-perfil-nivel {
+  font-size: 11px;
+  color: #60A5FA;
+  text-transform: capitalize;
+}
+
+.sidebar-perfil-objetivo {
+  font-size: 11px;
+  color: #475569;
+}
+
+.sidebar-perfil-edit {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.sidebar-perfil-vacio {
+  color: #475569;
+  font-size: 13px;
+  justify-content: center;
+}
+
+/* MODAL */
+.perfil-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.perfil-modal-card {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 32px;
+  width: 480px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.perfil-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.perfil-modal-close:hover {
+  color: #F8FAFC;
+}
