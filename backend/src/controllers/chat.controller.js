@@ -7,6 +7,7 @@
  */
 
 const axios = require("axios");
+const Rutina = require("../models/Rutina.model");
 
 // 🔧 1. Crear plantilla fija (tú controlas estructura)
 const crearPlantilla = (fechaInicio) => {
@@ -231,7 +232,24 @@ equipamiento: ${equipamiento}
     }
 
     // ✔️ respuesta final consistente
-    return res.json({ rutina: rutinaFinal });
+    const rutinaGuardada = await Rutina.create({
+    usuario: {
+      nombre, edad, peso, altura,
+      objetivo, nivel, dias, lesiones, fechaInicio
+    },
+    opciones: {
+      descanso:     req.body.descanso     || "",
+      duracion:     req.body.duracion     || "",
+      intensidad:   req.body.intensidad   || "",
+      equipamiento: req.body.equipamiento || ""
+    },
+    rutina: rutinaFinal
+  });
+
+  return res.json({
+    id:     rutinaGuardada._id,
+    rutina: rutinaFinal
+  });
 
   } catch (error) {
     console.error("❌ error general:", error.message);

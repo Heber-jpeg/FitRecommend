@@ -6,10 +6,22 @@
  * @date:       25-02-2026
  */
 
+require("dotenv").config();
 const app = require("./src/app");
+const conectarDB = require("./src/config/db");
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+conectarDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
+});
+
+// En server.js, después de conectarDB():
+conectarDB().then(() => {
+  console.log("MONGO_URI:", process.env.MONGO_URI); // ← verifica que no sea undefined
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
 });

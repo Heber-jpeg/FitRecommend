@@ -20,36 +20,36 @@ function Layout() {
   };
 
   return (
-  <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#0F172A" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#0F172A" }}>
 
-    <Navbar />
+      <Navbar />
 
-    {/* padding top igual a la altura del navbar */}
-    <div style={{ display: "flex", flex: 1, paddingTop: "64px" }}>
+      {/* padding top igual a la altura del navbar */}
+      <div style={{ display: "flex", flex: 1, paddingTop: "64px" }}>
 
-      <Sidebar
-        perfilData={perfilData}
-        onAbrirPerfil={() => setMostrarPerfil(true)}
-      />
+        <Sidebar
+          perfilData={perfilData}
+          onAbrirPerfil={() => setMostrarPerfil(true)}
+        />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
-        <Outlet />
+        <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+          <Outlet />
+        </div>
+
       </div>
+
+      {mostrarPerfil && (
+        <div className="perfil-modal-overlay" onClick={() => setMostrarPerfil(false)}>
+          <div className="perfil-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="perfil-modal-close" onClick={() => setMostrarPerfil(false)}>
+              ✕
+            </button>
+            <Perfil onGuardado={handlePerfilGuardado} />
+          </div>
+        </div>
+      )}
 
     </div>
-
-    {mostrarPerfil && (
-      <div className="perfil-modal-overlay" onClick={() => setMostrarPerfil(false)}>
-        <div className="perfil-modal-card" onClick={(e) => e.stopPropagation()}>
-          <button className="perfil-modal-close" onClick={() => setMostrarPerfil(false)}>
-            ✕
-          </button>
-          <Perfil onGuardado={handlePerfilGuardado} />
-        </div>
-      </div>
-    )}
-
-  </div>
 );
 }
 
