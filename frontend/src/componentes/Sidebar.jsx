@@ -13,9 +13,10 @@ function Sidebar({ perfilData, onAbrirPerfil }) {
   };
 
   const links = [
-    { path: "/",           icon: "🏠", label: "Inicio"     },
-    { path: "/rutinas",    icon: "⚡", label: "Rutinas"    },
-    { path: "/calendario", icon: "📅", label: "Calendario" },
+    { path: "/",            icon: "🏠", label: "Inicio"      },
+    { path: "/rutinas",     icon: "⚡", label: "Rutinas"     },
+    { path: "/calendario",  icon: "📅", label: "Calendario"  },
+    { path: "/mis-rutinas", icon: "📋", label: "Mis rutinas" },
   ];
 
   return (

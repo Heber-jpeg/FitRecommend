@@ -5,6 +5,9 @@ import Inicio from "./paginas/Inicio";
 import Perfil from "./paginas/Perfil";
 import Rutinas from "./paginas/Rutinas";
 import Calendario from "./paginas/Calendario";
+import MisRutinas from "./paginas/MisRutinas";
+
+
 
 
 function App() {
@@ -16,6 +19,7 @@ function App() {
           <Route path="perfil" element={<Perfil />} />
           <Route path="rutinas" element={<Rutinas />} />
           <Route path="calendario" element={<Calendario />} />
+          <Route path="mis-rutinas" element={<MisRutinas />} />
         </Route>
       </Routes>
     </BrowserRouter>

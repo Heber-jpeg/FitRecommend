@@ -19,6 +19,10 @@ app.use(cors({
 app.use(express.json());
 
 const chatRoutes = require("./routes/chat.routes");
+const globalRoutes = require("./routes/global.routes");
+
+
+app.use("/api", globalRoutes);
 
 app.use("/api", chatRoutes);
 
