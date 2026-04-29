@@ -8,6 +8,7 @@
 
 const axios = require("axios");
 const Rutina = require("../models/Rutina.model");
+const ejerciciosDB = require("../data/ejercicios.js");
 
 // 🔧 1. Crear plantilla fija (tú controlas estructura)
 const crearPlantilla = (fechaInicio) => {
@@ -104,85 +105,110 @@ const generateRoutine = async (req, res) => {
 
     const plantilla = crearPlantilla(fechaInicio);
 
- const prompt = `
-Tu única tarea es devolver un ARRAY JSON válido.
+    const eq = equipamiento || "gimnasio";
+    const pool = ejerciciosDB[eq] || ejerciciosDB["gimnasio"];
 
-NO expliques nada.
-NO agregues texto antes o después.
-NO uses markdown.
-NO uses comentarios.
+    const listaEjercicios = `
+      PUSH disponibles: ${pool.push.join(" | ")}
+      PULL disponibles: ${pool.pull.join(" | ")}
+      LEGS disponibles: ${pool.legs.join(" | ")}
+      CORE disponibles: ${pool.core.join(" | ")}
+    `;
 
-La salida DEBE poder ejecutarse directamente con JSON.parse sin errores.
+    const prompt = `
+      Tu única tarea es devolver un ARRAY JSON válido.
+      NO expliques nada.
+      NO agregues texto antes o después.
+      NO uses markdown.
+      NO uses comentarios.
+      La salida DEBE poder ejecutarse con JSON.parse sin errores.
 
----
+      FORMATO:
+      - Empieza con: [
+      - Termina con: ]
+      - EXACTAMENTE 7 objetos
 
-FORMATO OBLIGATORIO:
+      ESTRUCTURA día de entrenamiento:
+      {
+        "titulo": "Push" | "Pull" | "Legs" | "Core" | "Full Body",
+        "ejercicios": ["Ejercicio exacto de la lista - NxM", ...]
+      }
 
-- La salida debe comenzar con: [
-- La salida debe terminar con: ]
+      ESTRUCTURA día de descanso:
+      {
+        "titulo": "Descanso"
+      }
 
-- Debe contener EXACTAMENTE 7 objetos (índice 0 a 6)
-- NO devuelvas un objeto, SOLO un array
-- NO agregues claves extra
+      ═══════════════════════════════════
+      EJERCICIOS DISPONIBLES
+      (copia nombre y series/reps EXACTAMENTE)
+      ═══════════════════════════════════
+      ${listaEjercicios}
 
----
+      ═══════════════════════════════════
+      REGLAS DE EJERCICIOS
+      ═══════════════════════════════════
+      - EXACTAMENTE 5 ejercicios por día de entrenamiento
+      - Copia cada ejercicio EXACTAMENTE como aparece en la lista
+      - NO inventes ejercicios fuera de la lista
+      - Selecciona ejercicios del grupo muscular correspondiente al título del día
+      - Varía los ejercicios entre sesiones del mismo grupo muscular
 
-ESTRUCTURA DE CADA ELEMENTO:
+      ═══════════════════════════════════
+      DISTRIBUCIÓN SEGÚN DÍAS
+      ═══════════════════════════════════
+      1-2 días → Full Body
+      3 días   → Push / Pull / Legs
+      4 días   → Push / Pull / Legs / Full Body
+      5 días   → Push / Pull / Legs / Core / Full Body
+      6 días   → Push / Pull / Legs / Push / Pull / Legs
+      7 días   → Push / Pull / Legs / Push / Pull / Legs / Core
 
-Día de entrenamiento:
-{
-  "titulo": "nombre del grupo muscular",
-  "ejercicios": [
-    "Ejercicio - 3x10"
-  ]
-}
+      Los días de descanso deben distribuirse de forma inteligente,
+      NO juntar todos al final de la semana.
 
-Reglas:
-- "ejercicios" debe tener ENTRE 3 Y 5 elementos
-- Cada elemento debe ser string
-- Formato exacto: "Texto - NxM"
+      ═══════════════════════════════════
+      AJUSTE POR NIVEL
+      ═══════════════════════════════════
+      principiante → Series: 3 | Reps: 12-15 | Ejercicios básicos
+      intermedio   → Series: 3-4 | Reps: 8-12 | Compuestos + isolación
+      avanzado     → Series: 4-5 | Reps: 4-12 | Compuestos pesados + isolación
 
-Día de descanso:
-{
-  "titulo": "Descanso"
-}
+      ═══════════════════════════════════
+      AJUSTE POR OBJETIVO
+      ═══════════════════════════════════
+      musculo      → Reps: 8-12 | Enfoque en tensión muscular
+      perder_grasa → Reps: 12-20 | Mayor volumen
+      resistencia  → Reps: 15-20 | Poco descanso
 
-Reglas:
-- NO incluir "ejercicios"
+      ═══════════════════════════════════
+      DATOS DEL USUARIO
+      ═══════════════════════════════════
+      nombre:       ${nombre}
+      edad:         ${edad} años
+      peso:         ${peso} kg
+      altura:       ${altura} cm
+      nivel:        ${nivel}
+      objetivo:     ${objetivo}
+      lesiones:     ${lesiones}
+      equipamiento: ${equipamiento}
+      días/semana:  ${dias}
+      descanso:     ${descanso} seg entre series
+      duración:     ${duracion} min por sesión
+      intensidad:   ${intensidad}
 
----
+      ═══════════════════════════════════
+      REGLAS GLOBALES
+      ═══════════════════════════════════
+      - EXACTAMENTE ${dias} objetos deben ser entrenamiento
+      - El resto deben ser Descanso
+      - Un día de entrenamiento con menos de 5 ejercicios es INVÁLIDO
+      - NO usar null, undefined ni valores vacíos
+      - NO usar comas finales
 
-REGLAS GLOBALES:
-
-- EXACTAMENTE ${dias} elementos deben ser entrenamiento
-- Los demás deben ser "Descanso"
-- NO mezclar descanso con ejercicios
-- NO usar null, undefined, ni valores vacíos
-- NO usar comas finales (trailing commas)
-
----
-
-SI NO PUEDES CUMPLIR EXACTAMENTE TODAS LAS REGLAS:
-
-Devuelve exactamente:
-[]
-
----
-
-DATOS DEL USUARIO:
-
-nombre: ${nombre}
-edad: ${edad}
-peso: ${peso}
-altura: ${altura}
-nivel: ${nivel}
-objetivo: ${objetivo}
-lesiones: ${lesiones}
-descanso entre series: ${descanso} segundos
-duración de sesión: ${duracion} minutos
-intensidad: ${intensidad}
-equipamiento: ${equipamiento}
-`;
+      SI NO PUEDES CUMPLIR TODAS LAS REGLAS EXACTAMENTE:
+      Devuelve: []
+      `;
 
     let parsed = null;
 

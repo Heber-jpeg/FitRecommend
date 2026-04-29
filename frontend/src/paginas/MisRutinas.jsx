@@ -10,14 +10,12 @@ function MisRutinas() {
   const [descripcion, setDescripcion] = useState({});
   const [compartiendo, setCompartiendo] = useState({});
   const [exito, setExito] = useState({});
-  const [rutinaVista, setRutinaVista] = useState(null); // ← modal
+  const [rutinaVista, setRutinaVista] = useState(null);
 
   useEffect(() => {
     const perfil = localStorage.getItem("perfil");
     if (!perfil) { navigate("/rutinas"); return; }
-
     const { nombre } = JSON.parse(perfil);
-
     fetch(`http://localhost:3000/api/mis-rutinas?nombre=${encodeURIComponent(nombre)}`)
       .then(r => r.json())
       .then(data => setRutinas(data.rutinas || []))
@@ -28,6 +26,19 @@ function MisRutinas() {
   const handleCargarEnCalendario = (rutina) => {
     localStorage.setItem("rutinaCalendario", JSON.stringify({ rutina: rutina.rutina }));
     navigate("/calendario");
+  };
+
+  const handleEliminar = async (id) => {
+    if (!confirm("¿Eliminar esta rutina?")) return;
+    try {
+      const res = await fetch(`http://localhost:3000/api/mis-rutinas/${id}`, {
+        method: "DELETE"
+      });
+      if (!res.ok) throw new Error();
+      setRutinas(prev => prev.filter(r => r._id !== id));
+    } catch {
+      alert("Error al eliminar la rutina");
+    }
   };
 
   const handleCompartir = async (rutina) => {
@@ -113,13 +124,19 @@ function MisRutinas() {
                 className="misrutinas-btn-accion cargar"
                 onClick={() => handleCargarEnCalendario(rutina)}
               >
-                📅 Cargar en calendario
+                📅 Cargar
               </button>
               <button
                 className="misrutinas-btn-accion ver"
                 onClick={() => setRutinaVista(rutina)}
               >
-                👁 Ver rutina
+                👁 Ver
+              </button>
+              <button
+                className="misrutinas-btn-accion eliminar"
+                onClick={() => handleEliminar(rutina._id)}
+              >
+                🗑 Eliminar
               </button>
             </div>
 

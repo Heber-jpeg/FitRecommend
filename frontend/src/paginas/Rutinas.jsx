@@ -132,9 +132,9 @@ function Rutinas() {
           <div className="exito-card">
             <span className="exito-icono">✅</span>
             <h3>¡Rutina generada con éxito!</h3>
-            <p>Tu rutina mensual está lista. Puedes verla en el calendario.</p>
-            <button className="btn-generar" onClick={() => navigate("/calendario")}>
-              📅 Ver mi rutina
+            <p>Tu rutina mensual está lista. Puedes verla en Mis Rutinas.</p>
+            <button className="btn-generar" onClick={() => navigate("/mis-rutinas")}>
+              📋 Ver mi rutina
             </button>
           </div>
         )}

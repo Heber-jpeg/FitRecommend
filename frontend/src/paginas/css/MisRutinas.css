@@ -360,3 +360,14 @@
     grid-template-columns: 1fr;
   }
 }
+.misrutinas-btn-accion.eliminar {
+  background: #2D1A1A;
+  color: #F87171;
+  flex: none;
+  padding: 10px 14px;
+}
+
+.misrutinas-btn-accion.eliminar:hover {
+  background: #3D1F1F;
+  color: #FCA5A5;
+}

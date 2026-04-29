@@ -71,5 +71,22 @@ const obtenerMisRutinas = async (req, res) => {
     return res.status(500).json({ error: "Error interno" });
   }
 };
+const eliminarRutina = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-module.exports = { compartirRutina, obtenerRutinasGlobales, obtenerMisRutinas };
+    const eliminada = await Rutina.findByIdAndDelete(id);
+
+    if (!eliminada) {
+      return res.status(404).json({ error: "Rutina no encontrada" });
+    }
+
+    return res.json({ ok: true });
+
+  } catch (error) {
+    console.error("❌ error eliminando:", error.message);
+    return res.status(500).json({ error: "Error interno" });
+  }
+};
+
+module.exports = { compartirRutina, obtenerRutinasGlobales, obtenerMisRutinas, eliminarRutina };
