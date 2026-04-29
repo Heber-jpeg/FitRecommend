@@ -222,7 +222,7 @@
   height: 1px;
   background: #334155;
 }
-/* MODAL */
+/* OVERLAY */
 .misrutinas-modal-overlay {
   position: fixed;
   inset: 0;
@@ -234,12 +234,13 @@
   z-index: 1000;
 }
 
+/* MODAL */
 .misrutinas-modal {
   background: #1E293B;
   border: 1px solid #334155;
   border-radius: 16px;
   padding: 28px;
-  width: 700px;
+  width: 600px;
   max-width: 92vw;
   max-height: 85vh;
   overflow-y: auto;
@@ -297,61 +298,60 @@
   gap: 8px;
 }
 
-/* DÍAS */
-.misrutinas-modal-dias {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+/* GRUPOS MODAL */
+.misrutinas-modal-grupos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.misrutinas-modal-dia {
+.misrutinas-modal-grupo {
   background: #0F172A;
   border: 1px solid #334155;
   border-radius: 10px;
-  padding: 12px;
+  padding: 16px;
+}
+
+.misrutinas-modal-grupo-titulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: #60A5FA;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #1E3A5F;
+  padding-bottom: 8px;
+}
+
+.misrutinas-modal-grupo-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.misrutinas-modal-dia.descanso {
-  background: #111827;
-  border-style: dashed;
-  opacity: 0.6;
-}
-
-.misrutinas-modal-dia-header {
+.misrutinas-modal-grupo-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-
-.misrutinas-modal-dia-nombre {
-  font-size: 12px;
-  font-weight: 600;
-  color: #60A5FA;
-}
-
-.misrutinas-modal-dia-fecha {
-  font-size: 10px;
-  color: #475569;
-}
-
-.misrutinas-modal-dia-titulo {
+  gap: 10px;
   font-size: 13px;
-  font-weight: 500;
-  color: #F8FAFC;
+  color: #CBD5E1;
 }
 
-.misrutinas-modal-ejercicios {
-  padding-left: 14px;
-  margin: 0;
-}
-
-.misrutinas-modal-ejercicios li {
+.misrutinas-modal-grupo-num {
+  background: #1D3B6E;
+  color: #60A5FA;
   font-size: 11px;
-  color: #94A3B8;
-  margin-bottom: 4px;
+  font-weight: 700;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* RESPONSIVE */

@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/Calendario.css";
 
 function Calendario() {
 
   const navigate = useNavigate();
+  const [diaVisto, setDiaVisto] = useState(null);
+  const [series, setSeries] = useState({});      // { "ejIdx-serieIdx": true/false }
+  const [timer, setTimer] = useState(null);       // segundos restantes
+  const [timerActivo, setTimerActivo] = useState(false);
+  const intervalRef = useRef(null);
+
+  const cargada = JSON.parse(localStorage.getItem("rutinaCalendario") || "null");
+  const descansoSeg = Number(cargada?.descanso || 60);
 
   const [rutina, setRutina] = useState(() => {
-    const cargada = localStorage.getItem("rutinaCalendario");
-    return cargada ? JSON.parse(cargada).rutina : null;
+    return cargada ? cargada.rutina : null;
   });
 
   const hoy = new Date();
@@ -37,6 +44,66 @@ function Calendario() {
     localStorage.removeItem("rutinaCalendario");
     setRutina(null);
   };
+
+  // Parsear series y reps del string "Ejercicio - 4x10"
+  const parsearEjercicio = (ejStr) => {
+    const match = ejStr.match(/^(.+?)\s*-\s*(\d+)x(\d+)(.*)$/);
+    if (match) {
+      return {
+        nombre: match[1].trim(),
+        series: Number(match[2]),
+        reps:   Number(match[3]),
+        extra:  match[4].trim()
+      };
+    }
+    return { nombre: ejStr, series: 3, reps: 10, extra: "" };
+  };
+
+  // Marcar serie como completada e iniciar timer
+  const handleSerie = (ejIdx, serieIdx) => {
+    const key = `${ejIdx}-${serieIdx}`;
+    const yaCompletada = series[key];
+
+    setSeries(prev => ({ ...prev, [key]: !yaCompletada }));
+
+    if (!yaCompletada) {
+      iniciarTimer();
+    }
+  };
+
+  const iniciarTimer = () => {
+    clearInterval(intervalRef.current);
+    setTimer(descansoSeg);
+    setTimerActivo(true);
+
+    intervalRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current);
+          setTimerActivo(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const cancelarTimer = () => {
+    clearInterval(intervalRef.current);
+    setTimerActivo(false);
+    setTimer(null);
+  };
+
+  // Limpiar timer al cerrar modal
+  const cerrarModal = () => {
+    cancelarTimer();
+    setSeries({});
+    setDiaVisto(null);
+  };
+
+  useEffect(() => {
+    return () => clearInterval(intervalRef.current);
+  }, []);
 
   if (!rutina) {
     return (
@@ -76,20 +143,13 @@ function Calendario() {
     <div className="calendario-container">
       <main className="calendario-main">
 
-        {/* ENCABEZADO */}
         <div className="calendario-titulo-row">
           <h2>{nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}</h2>
           <div className="calendario-acciones">
-            <button
-              className="calendario-btn-sm"
-              onClick={() => navigate("/mis-rutinas")}
-            >
+            <button className="calendario-btn-sm" onClick={() => navigate("/mis-rutinas")}>
               🔄 Cambiar rutina
             </button>
-            <button
-              className="calendario-btn-sm danger"
-              onClick={handleLimpiar}
-            >
+            <button className="calendario-btn-sm danger" onClick={handleLimpiar}>
               🗑 Limpiar
             </button>
           </div>
@@ -105,14 +165,17 @@ function Calendario() {
           {Array.from({ length: calcularOffset() }).map((_, i) => (
             <div key={`empty-${i}`} className="calendario-card empty" />
           ))}
+
           {rutinaFiltrada.map((dia, index) => {
             const fecha = new Date(dia.fecha + "T00:00:00");
             const esHoy = fecha.getTime() === hoy.getTime();
+            const esDescanso = !dia.ejercicios?.length;
+
             return (
               <div
                 key={index}
                 className={`calendario-card
-                  ${!dia.ejercicios?.length ? "calendario-rest-day" : ""}
+                  ${esDescanso ? "calendario-rest-day" : ""}
                   ${esHoy ? "calendario-hoy" : ""}
                 `}
               >
@@ -122,14 +185,15 @@ function Calendario() {
                 </span>
                 <h3>{dia.nombreDia || dia.dia}</h3>
                 <h4>{dia.titulo}</h4>
-                {dia.ejercicios?.length ? (
-                  <ul>
-                    {dia.ejercicios.map((ej, i) => (
-                      <li key={i}>{ej}</li>
-                    ))}
-                  </ul>
-                ) : (
+                {esDescanso ? (
                   <p className="calendario-descanso">Descanso</p>
+                ) : (
+                  <button
+                    className="calendario-ver-btn"
+                    onClick={() => setDiaVisto(dia)}
+                  >
+                    Ver rutina
+                  </button>
                 )}
               </div>
             );
@@ -137,6 +201,96 @@ function Calendario() {
         </div>
 
       </main>
+
+      {/* MODAL */}
+      {diaVisto && (
+        <div className="calendario-modal-overlay" onClick={cerrarModal}>
+          <div className="calendario-modal" onClick={(e) => e.stopPropagation()}>
+
+            <div className="calendario-modal-header">
+              <div>
+                <h3>{diaVisto.titulo}</h3>
+                <span className="calendario-modal-sub">
+                  {diaVisto.nombreDia} — {new Date(diaVisto.fecha + "T00:00:00")
+                    .toLocaleDateString("es-MX", { day: "numeric", month: "long" })}
+                </span>
+              </div>
+              <button className="calendario-modal-close" onClick={cerrarModal}>✕</button>
+            </div>
+
+            {/* TIMER */}
+            {timerActivo && timer !== null && (
+              <div className="calendario-timer">
+                <div className="calendario-timer-circulo">
+                  <span className="calendario-timer-seg">{timer}</span>
+                  <span className="calendario-timer-label">seg</span>
+                </div>
+                <p className="calendario-timer-texto">⏱ Descansando...</p>
+                <button className="calendario-timer-skip" onClick={cancelarTimer}>
+                  Saltar descanso
+                </button>
+              </div>
+            )}
+
+            {!timerActivo && timer === 0 && (
+              <div className="calendario-timer-listo">
+                ✅ ¡Descanso completado! Siguiente serie.
+              </div>
+            )}
+
+            {/* EJERCICIOS */}
+            <div className="calendario-modal-ejercicios">
+              {diaVisto.ejercicios.map((ejStr, ejIdx) => {
+                const ej = parsearEjercicio(ejStr);
+                const todasCompletadas = Array.from({ length: ej.series })
+                  .every((_, si) => series[`${ejIdx}-${si}`]);
+
+                return (
+                  <div
+                    key={ejIdx}
+                    className={`cal-ej ${todasCompletadas ? "cal-ej-done" : ""}`}
+                  >
+                    <div className="cal-ej-header">
+                      <span className="cal-ej-num">{ejIdx + 1}</span>
+                      <div className="cal-ej-info">
+                        <span className="cal-ej-nombre">{ej.nombre}</span>
+                        <span className="cal-ej-meta">
+                          {ej.series} series × {ej.reps} reps
+                          {ej.extra && ` ${ej.extra}`}
+                        </span>
+                      </div>
+                      {todasCompletadas && (
+                        <span className="cal-ej-check">✓</span>
+                      )}
+                    </div>
+
+                    <div className="cal-ej-series">
+                      {Array.from({ length: ej.series }).map((_, si) => {
+                        const key = `${ejIdx}-${si}`;
+                        const completada = !!series[key];
+                        return (
+                          <button
+                            key={si}
+                            className={`cal-serie-btn ${completada ? "completada" : ""}`}
+                            onClick={() => handleSerie(ejIdx, si)}
+                          >
+                            <span className="cal-serie-num">Serie {si + 1}</span>
+                            <span className="cal-serie-reps">{ej.reps} reps</span>
+                            {completada && <span className="cal-serie-check">✓</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

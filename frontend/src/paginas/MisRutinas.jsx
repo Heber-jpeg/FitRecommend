@@ -24,7 +24,10 @@ function MisRutinas() {
   }, []);
 
   const handleCargarEnCalendario = (rutina) => {
-    localStorage.setItem("rutinaCalendario", JSON.stringify({ rutina: rutina.rutina }));
+    localStorage.setItem("rutinaCalendario", JSON.stringify({
+      rutina: rutina.rutina,
+      descanso: rutina.opciones.descanso  // ← agrega esto
+    }));
     navigate("/calendario");
   };
 
@@ -170,61 +173,67 @@ function MisRutinas() {
       </div>
 
       {/* MODAL VER RUTINA */}
-      {rutinaVista && (
-        <div className="misrutinas-modal-overlay" onClick={() => setRutinaVista(null)}>
-          <div className="misrutinas-modal" onClick={(e) => e.stopPropagation()}>
+{rutinaVista && (
+  <div className="misrutinas-modal-overlay" onClick={() => setRutinaVista(null)}>
+    <div className="misrutinas-modal" onClick={(e) => e.stopPropagation()}>
 
-            <div className="misrutinas-modal-header">
-              <div>
-                <h3>Rutina completa</h3>
-                <span className="misrutinas-modal-fecha">
-                  {formatFecha(rutinaVista.creadoEn)}
-                </span>
-              </div>
-              <button
-                className="misrutinas-modal-close"
-                onClick={() => setRutinaVista(null)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="misrutinas-modal-badges">
-              <span className="misrutinas-badge">
-                {objetivoLabel[rutinaVista.usuario.objetivo] || rutinaVista.usuario.objetivo}
-              </span>
-              <span className="misrutinas-badge nivel">{rutinaVista.usuario.nivel}</span>
-              <span className="misrutinas-badge">⏱ {rutinaVista.opciones.descanso}s</span>
-              <span className="misrutinas-badge">🕐 {rutinaVista.opciones.duracion} min</span>
-              <span className="misrutinas-badge">🔥 {rutinaVista.opciones.intensidad}</span>
-              <span className="misrutinas-badge">🏋️ {rutinaVista.opciones.equipamiento}</span>
-            </div>
-
-            <div className="misrutinas-modal-dias">
-              {rutinaVista.rutina.map((dia, i) => (
-                <div
-                  key={i}
-                  className={`misrutinas-modal-dia ${!dia.ejercicios?.length ? "descanso" : ""}`}
-                >
-                  <div className="misrutinas-modal-dia-header">
-                    <span className="misrutinas-modal-dia-nombre">{dia.nombreDia}</span>
-                    <span className="misrutinas-modal-dia-fecha">{dia.fecha}</span>
-                  </div>
-                  <span className="misrutinas-modal-dia-titulo">{dia.titulo}</span>
-                  {dia.ejercicios?.length > 0 && (
-                    <ul className="misrutinas-modal-ejercicios">
-                      {dia.ejercicios.map((ej, j) => (
-                        <li key={j}>{ej}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-
-          </div>
+      <div className="misrutinas-modal-header">
+        <div>
+          <h3>Rutina completa</h3>
+          <span className="misrutinas-modal-fecha">
+            {formatFecha(rutinaVista.creadoEn)}
+          </span>
         </div>
-      )}
+        <button
+          className="misrutinas-modal-close"
+          onClick={() => setRutinaVista(null)}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="misrutinas-modal-badges">
+        <span className="misrutinas-badge">
+          {objetivoLabel[rutinaVista.usuario.objetivo] || rutinaVista.usuario.objetivo}
+        </span>
+        <span className="misrutinas-badge nivel">{rutinaVista.usuario.nivel}</span>
+        <span className="misrutinas-badge">⏱ {rutinaVista.opciones.descanso}s</span>
+        <span className="misrutinas-badge">🕐 {rutinaVista.opciones.duracion} min</span>
+        <span className="misrutinas-badge">🔥 {rutinaVista.opciones.intensidad}</span>
+        <span className="misrutinas-badge">🏋️ {rutinaVista.opciones.equipamiento}</span>
+      </div>
+
+      {/* GRUPOS ÚNICOS */}
+      <div className="misrutinas-modal-grupos">
+        {(() => {
+          // Agrupa días por título, descartando Descanso y duplicados
+          const grupos = {};
+          rutinaVista.rutina.forEach((dia) => {
+            if (dia.titulo === "Descanso" || !dia.ejercicios?.length) return;
+            if (!grupos[dia.titulo]) {
+              grupos[dia.titulo] = dia.ejercicios;
+            }
+          });
+
+          return Object.entries(grupos).map(([titulo, ejercicios]) => (
+            <div key={titulo} className="misrutinas-modal-grupo">
+              <h4 className="misrutinas-modal-grupo-titulo">{titulo}</h4>
+              <ul className="misrutinas-modal-grupo-lista">
+                {ejercicios.map((ej, i) => (
+                  <li key={i} className="misrutinas-modal-grupo-item">
+                    <span className="misrutinas-modal-grupo-num">{i + 1}</span>
+                    {ej}
+                  </li>
+                ))}
+              </ul>
+            </div>  
+          ));
+        })()}
+      </div>
+
+    </div>
+  </div>
+)}
 
     </div>
   );
