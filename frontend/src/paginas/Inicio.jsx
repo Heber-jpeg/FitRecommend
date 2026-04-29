@@ -5,15 +5,18 @@ function Inicio() {
 
   const [rutinas, setRutinas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/globales")
-      .then(r => r.json())
-      .then(data => setRutinas(data.rutinas || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
+  fetch("http://localhost:3000/api/globales")
+    .then(r => r.json())
+    .then(data => {
+      console.log("Total rutinas:", data.rutinas?.length); // verifica cantidad
+      setRutinas(data.rutinas || []);
+    })
+    .catch(() => setError(true))
+    .finally(() => setLoading(false));
+}, []);
   const objetivoLabel = {
     musculo:      "Ganar músculo",
     perder_grasa: "Perder grasa",
@@ -39,48 +42,62 @@ function Inicio() {
 
         <h2>Rutinas de la comunidad</h2>
 
-        {loading && <p className="inicio-loading">Cargando rutinas...</p>}
+        {loading && (
+          <div className="inicio-empty">
+            <span>⏳</span>
+            <p>Cargando rutinas...</p>
+          </div>
+        )}
 
-        {!loading && rutinas.length === 0 && (
+        {!loading && error && (
+          <div className="inicio-empty">
+            <span>⚠️</span>
+            <p>No se pudieron cargar las rutinas. Verifica tu conexión.</p>
+          </div>
+        )}
+
+        {!loading && !error && rutinas.length === 0 && (
           <div className="inicio-empty">
             <span>🏋️</span>
             <p>Aún no hay rutinas compartidas. ¡Sé el primero!</p>
           </div>
         )}
 
-        <div className="inicio-grid">
-          {rutinas.map((r) => (
-            <div key={r._id} className="inicio-card">
+        {!loading && !error && rutinas.length > 0 && (
+          <div className="inicio-grid">
+            {rutinas.map((r) => (
+  <div key={r._id} className="inicio-card">
 
-              <div className="inicio-card-top">
-                <div className="inicio-avatar">
-                  {r.autor.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <span className="inicio-autor">{r.autor}</span>
-                  <span className="inicio-fecha">{formatFecha(r.creadoEn)}</span>
-                </div>
-              </div>
+    <div className="inicio-card-top">
+      <div className="inicio-avatar">
+        {r.autor?.charAt(0).toUpperCase() ?? "?"}
+      </div>
+      <div>
+        <span className="inicio-autor">{r.autor ?? "Anónimo"}</span>
+        <span className="inicio-fecha">{r.creadoEn ? formatFecha(r.creadoEn) : ""}</span>
+      </div>
+    </div>
 
-              <p className="inicio-descripcion">{r.descripcion}</p>
+    <p className="inicio-descripcion">{r.descripcion ?? ""}</p>
 
-              <div className="inicio-badges">
-                <span className="inicio-badge">
-                  {objetivoLabel[r.objetivo] || r.objetivo}
-                </span>
-                <span className="inicio-badge nivel">{r.nivel}</span>
-              </div>
+    <div className="inicio-badges">
+      <span className="inicio-badge">
+        {objetivoLabel[r.objetivo] ?? r.objetivo ?? ""}
+      </span>
+      <span className="inicio-badge nivel">{r.nivel ?? ""}</span>
+    </div>
 
-              <div className="inicio-detalles">
-                <span>⏱ {r.opciones.descanso}s</span>
-                <span>🕐 {r.opciones.duracion} min</span>
-                <span>🔥 {r.opciones.intensidad}</span>
-                <span>🏋️ {r.opciones.equipamiento}</span>
-              </div>
+    <div className="inicio-detalles">
+      <span>⏱ {r.opciones?.descanso ?? "-"}s</span>
+      <span>🕐 {r.opciones?.duracion ?? "-"} min</span>
+      <span>🔥 {r.opciones?.intensidad ?? "-"}</span>
+      <span>🏋️ {r.opciones?.equipamiento ?? "-"}</span>
+    </div>
 
-            </div>
-          ))}
-        </div>
+  </div>
+))}
+          </div>
+        )}
 
       </div>
 

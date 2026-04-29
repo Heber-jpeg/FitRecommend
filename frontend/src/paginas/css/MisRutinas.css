@@ -184,3 +184,179 @@
 @media (max-width: 600px) {
   .misrutinas-grid { grid-template-columns: 1fr; }
 }
+.misrutinas-acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.misrutinas-btn-accion {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.misrutinas-btn-accion.cargar {
+  background: #1D3B6E;
+  color: #60A5FA;
+}
+
+.misrutinas-btn-accion.cargar:hover {
+  background: #1e4a8a;
+}
+
+.misrutinas-btn-accion.ver {
+  background: #1E3A2F;
+  color: #4ADE80;
+}
+
+.misrutinas-btn-accion.ver:hover {
+  background: #1a4d38;
+}
+
+.misrutinas-divider {
+  height: 1px;
+  background: #334155;
+}
+/* MODAL */
+.misrutinas-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.misrutinas-modal {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 28px;
+  width: 700px;
+  max-width: 92vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.misrutinas-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.misrutinas-modal::-webkit-scrollbar-thumb {
+  background: #3B82F6;
+  border-radius: 10px;
+}
+
+/* HEADER MODAL */
+.misrutinas-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.misrutinas-modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: #F8FAFC;
+}
+
+.misrutinas-modal-fecha {
+  font-size: 12px;
+  color: #475569;
+}
+
+.misrutinas-modal-close {
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.misrutinas-modal-close:hover {
+  color: #F8FAFC;
+}
+
+/* BADGES */
+.misrutinas-modal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* DÍAS */
+.misrutinas-modal-dias {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.misrutinas-modal-dia {
+  background: #0F172A;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.misrutinas-modal-dia.descanso {
+  background: #111827;
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.misrutinas-modal-dia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.misrutinas-modal-dia-nombre {
+  font-size: 12px;
+  font-weight: 600;
+  color: #60A5FA;
+}
+
+.misrutinas-modal-dia-fecha {
+  font-size: 10px;
+  color: #475569;
+}
+
+.misrutinas-modal-dia-titulo {
+  font-size: 13px;
+  font-weight: 500;
+  color: #F8FAFC;
+}
+
+.misrutinas-modal-ejercicios {
+  padding-left: 14px;
+  margin: 0;
+}
+
+.misrutinas-modal-ejercicios li {
+  font-size: 11px;
+  color: #94A3B8;
+  margin-bottom: 4px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .misrutinas-modal-dias {
+    grid-template-columns: 1fr;
+  }
+}

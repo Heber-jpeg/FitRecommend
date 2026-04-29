@@ -6,11 +6,14 @@ const compartirRutina = async (req, res) => {
   try {
     const { rutinaId, descripcion } = req.body;
 
+    console.log("📥 Body recibido:", req.body);  // ← verifica que llegan los datos
+
     if (!rutinaId || !descripcion) {
       return res.status(400).json({ error: "Faltan datos" });
     }
 
     const rutina = await Rutina.findById(rutinaId);
+    console.log("🔍 Rutina encontrada:", rutina);  // ← verifica que encuentra la rutina
 
     if (!rutina) {
       return res.status(404).json({ error: "Rutina no encontrada" });
@@ -25,6 +28,8 @@ const compartirRutina = async (req, res) => {
       rutina:      rutina.rutina
     });
 
+    console.log("✅ Guardada en rutinasGlobales:", nueva._id);  // ← verifica que se guardó
+
     return res.json({ ok: true, id: nueva._id });
 
   } catch (error) {
@@ -38,15 +43,15 @@ const obtenerRutinasGlobales = async (req, res) => {
   try {
     const rutinas = await RutinaGlobal.find()
       .sort({ creadoEn: -1 })
-      .select("autor descripcion nivel objetivo opciones creadoEn");
-
+      // ❌ antes solo traía algunos campos
+      // ahora trae todo
+    
     return res.json({ rutinas });
   } catch (error) {
     console.error("❌ error obteniendo globales:", error.message);
     return res.status(500).json({ error: "Error interno" });
   }
 };
-
 // Obtener rutinas guardadas del usuario (MisRutinas)
 const obtenerMisRutinas = async (req, res) => {
   try {

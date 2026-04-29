@@ -6,13 +6,13 @@ function Calendario() {
 
   const navigate = useNavigate();
 
+  const [rutina, setRutina] = useState(() => {
+    const cargada = localStorage.getItem("rutinaCalendario");
+    return cargada ? JSON.parse(cargada).rutina : null;
+  });
+
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
-
-  const [rutina] = useState(() => {
-    const guardada = localStorage.getItem("rutinaGenerada");
-    return guardada ? JSON.parse(guardada).rutina : null;
-  });
 
   const rutinaFiltrada = rutina?.filter((dia) => {
     if (!dia.fecha) return false;
@@ -33,16 +33,21 @@ function Calendario() {
 
   const nombreMes = hoy.toLocaleDateString("es-MX", { month: "long", year: "numeric" });
 
+  const handleLimpiar = () => {
+    localStorage.removeItem("rutinaCalendario");
+    setRutina(null);
+  };
+
   if (!rutina) {
     return (
       <div className="calendario-container">
         <main className="calendario-main">
           <div className="calendario-empty-card">
-            <span>📭</span>
-            <h3>No hay rutina generada</h3>
-            <p>Primero genera una rutina desde la sección de personalización.</p>
-            <button className="calendario-btn" onClick={() => navigate("/rutinas")}>
-              ⚡ Generar rutina
+            <span>📅</span>
+            <h3>No hay rutina cargada</h3>
+            <p>Ve a Mis Rutinas y carga una rutina para verla aquí.</p>
+            <button className="calendario-btn" onClick={() => navigate("/mis-rutinas")}>
+              📋 Ir a Mis Rutinas
             </button>
           </div>
         </main>
@@ -71,7 +76,24 @@ function Calendario() {
     <div className="calendario-container">
       <main className="calendario-main">
 
-        <h2>{nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}</h2>
+        {/* ENCABEZADO */}
+        <div className="calendario-titulo-row">
+          <h2>{nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}</h2>
+          <div className="calendario-acciones">
+            <button
+              className="calendario-btn-sm"
+              onClick={() => navigate("/mis-rutinas")}
+            >
+              🔄 Cambiar rutina
+            </button>
+            <button
+              className="calendario-btn-sm danger"
+              onClick={handleLimpiar}
+            >
+              🗑 Limpiar
+            </button>
+          </div>
+        </div>
 
         <div className="calendario-header">
           {["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map((d, i) => (
@@ -86,7 +108,6 @@ function Calendario() {
           {rutinaFiltrada.map((dia, index) => {
             const fecha = new Date(dia.fecha + "T00:00:00");
             const esHoy = fecha.getTime() === hoy.getTime();
-
             return (
               <div
                 key={index}
