@@ -89,4 +89,49 @@ const eliminarRutina = async (req, res) => {
   }
 };
 
-module.exports = { compartirRutina, obtenerRutinasGlobales, obtenerMisRutinas, eliminarRutina };
+
+const guardarRutinaGlobal = async (req, res) => {
+  try {
+    const { rutinaGlobalId, nombreUsuario } = req.body;
+
+    if (!rutinaGlobalId || !nombreUsuario) {
+      return res.status(400).json({ error: "Faltan datos" });
+    }
+
+    const rutinaGlobal = await RutinaGlobal.findById(rutinaGlobalId);
+
+    if (!rutinaGlobal) {
+      return res.status(404).json({ error: "Rutina no encontrada" });
+    }
+
+    const nueva = await Rutina.create({
+      usuario: {
+        nombre:      nombreUsuario,
+        edad:        0,
+        peso:        0,
+        altura:      0,
+        objetivo:    rutinaGlobal.objetivo,
+        nivel:       rutinaGlobal.nivel,
+        dias:        0,
+        lesiones:    "",
+        fechaInicio: new Date().toISOString().split("T")[0]
+      },
+      opciones: rutinaGlobal.opciones,
+      rutina:   rutinaGlobal.rutina
+    });
+
+    return res.json({ ok: true, id: nueva._id });
+
+  } catch (error) {
+    console.error("❌ error guardando rutina global:", error.message);
+    return res.status(500).json({ error: "Error interno" });
+  }
+};
+
+module.exports = {
+  compartirRutina,
+  obtenerRutinasGlobales,
+  obtenerMisRutinas,
+  eliminarRutina,
+  guardarRutinaGlobal
+};
