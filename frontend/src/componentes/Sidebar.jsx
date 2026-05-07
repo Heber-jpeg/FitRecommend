@@ -6,6 +6,16 @@ function Sidebar({ perfilData, onAbrirPerfil }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("perfil");
+    localStorage.removeItem("rutinaCalendario");
+    localStorage.removeItem("rutinaGenerada");
+    navigate("/login");
+  };
+
+
   const objetivoLabel = {
     musculo: "Ganar músculo",
     perder_grasa: "Perder grasa",
@@ -58,11 +68,9 @@ function Sidebar({ perfilData, onAbrirPerfil }) {
 
       <div className="sidebar-divider" />
 
-      <button
-        className="sidebar-btn"
-        onClick={onAbrirPerfil}
-      >
-        👤 Mi perfil
+    
+      <button className="sidebar-btn danger" onClick={handleLogout}>
+        🚪 Cerrar sesión
       </button>
 
     </aside>

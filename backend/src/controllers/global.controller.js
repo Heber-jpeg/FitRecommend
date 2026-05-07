@@ -55,34 +55,27 @@ const obtenerRutinasGlobales = async (req, res) => {
 // Obtener rutinas guardadas del usuario (MisRutinas)
 const obtenerMisRutinas = async (req, res) => {
   try {
-    const { nombre } = req.query;
-
-    if (!nombre) {
-      return res.status(400).json({ error: "Falta nombre" });
-    }
-
-    const rutinas = await Rutina.find({ "usuario.nombre": nombre })
-      .sort({ creadoEn: -1 })
-      .select("usuario opciones rutina creadoEn");
-
+    const rutinas = await Rutina.find({ usuarioId: req.usuario.id })
+      .sort({ creadoEn: -1 });
     return res.json({ rutinas });
   } catch (error) {
     console.error("❌ error obteniendo mis rutinas:", error.message);
     return res.status(500).json({ error: "Error interno" });
   }
 };
+
 const eliminarRutina = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const eliminada = await Rutina.findByIdAndDelete(id);
-
+    // Verifica que la rutina pertenece al usuario
+    const eliminada = await Rutina.findOneAndDelete({
+      _id: id,
+      usuarioId: req.usuario.id
+    });
     if (!eliminada) {
       return res.status(404).json({ error: "Rutina no encontrada" });
     }
-
     return res.json({ ok: true });
-
   } catch (error) {
     console.error("❌ error eliminando:", error.message);
     return res.status(500).json({ error: "Error interno" });
@@ -92,9 +85,9 @@ const eliminarRutina = async (req, res) => {
 
 const guardarRutinaGlobal = async (req, res) => {
   try {
-    const { rutinaGlobalId, nombreUsuario } = req.body;
+    const { rutinaGlobalId } = req.body;
 
-    if (!rutinaGlobalId || !nombreUsuario) {
+    if (!rutinaGlobalId) {
       return res.status(400).json({ error: "Faltan datos" });
     }
 
@@ -105,8 +98,9 @@ const guardarRutinaGlobal = async (req, res) => {
     }
 
     const nueva = await Rutina.create({
+      usuarioId: req.usuario.id,        // ← viene del token
       usuario: {
-        nombre:      nombreUsuario,
+        nombre:      req.usuario.username,
         edad:        0,
         peso:        0,
         altura:      0,

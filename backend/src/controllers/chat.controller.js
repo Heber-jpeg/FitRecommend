@@ -258,19 +258,21 @@ const generateRoutine = async (req, res) => {
     }
 
     // ✔️ respuesta final consistente
+    // Al final de generateRoutine, reemplaza el Rutina.create:
     const rutinaGuardada = await Rutina.create({
-    usuario: {
-      nombre, edad, peso, altura,
-      objetivo, nivel, dias, lesiones, fechaInicio
-    },
-    opciones: {
-      descanso:     req.body.descanso     || "",
-      duracion:     req.body.duracion     || "",
-      intensidad:   req.body.intensidad   || "",
-      equipamiento: req.body.equipamiento || ""
-    },
-    rutina: rutinaFinal
-  });
+      usuarioId: req.usuario.id,     // ← viene del token
+      usuario: {
+        nombre, edad, peso, altura,
+        objetivo, nivel, dias, lesiones, fechaInicio
+      },
+      opciones: {
+        descanso:     req.body.descanso     || "",
+        duracion:     req.body.duracion     || "",
+        intensidad:   req.body.intensidad   || "",
+        equipamiento: req.body.equipamiento || ""
+      },
+      rutina: rutinaFinal
+    });
 
   return res.json({
     id:     rutinaGuardada._id,

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../utils/api";
+
 import "./css/Rutinas.css";
 
 function Rutinas() {
@@ -45,9 +47,8 @@ function Rutinas() {
     try {
       setLoading(true);
       setExito(false);
-      const res = await fetch("http://localhost:3000/api/chat", {
+      const res = await apiFetch("/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
       if (!res.ok) throw new Error("Error en el servidor");

@@ -20,10 +20,13 @@ app.use(express.json());
 
 const chatRoutes = require("./routes/chat.routes");
 const globalRoutes = require("./routes/global.routes");
+const authRoutes = require("./routes/auth.routes");
 
 
 app.use("/api", globalRoutes);
 
 app.use("/api", chatRoutes);
+
+app.use("/api/auth", authRoutes);
 
 module.exports = app;

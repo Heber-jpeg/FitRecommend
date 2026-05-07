@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../utils/api";
+
 import "./css/MisRutinas.css";
 
 function MisRutinas() {
@@ -16,7 +18,8 @@ function MisRutinas() {
     const perfil = localStorage.getItem("perfil");
     if (!perfil) { navigate("/rutinas"); return; }
     const { nombre } = JSON.parse(perfil);
-    fetch(`http://localhost:3000/api/mis-rutinas?nombre=${encodeURIComponent(nombre)}`)
+    apiFetch("/mis-rutinas")
+
       .then(r => r.json())
       .then(data => setRutinas(data.rutinas || []))
       .catch(console.error)
@@ -34,9 +37,7 @@ function MisRutinas() {
   const handleEliminar = async (id) => {
     if (!confirm("¿Eliminar esta rutina?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/mis-rutinas/${id}`, {
-        method: "DELETE"
-      });
+      const res = await apiFetch(`/mis-rutinas/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       setRutinas(prev => prev.filter(r => r._id !== id));
     } catch {
@@ -52,9 +53,8 @@ function MisRutinas() {
     }
     setCompartiendo(prev => ({ ...prev, [rutina._id]: true }));
     try {
-      const res = await fetch("http://localhost:3000/api/compartir", {
+      const res = await apiFetch("/compartir", {   
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rutinaId: rutina._id, descripcion: desc })
       });
       if (!res.ok) throw new Error();

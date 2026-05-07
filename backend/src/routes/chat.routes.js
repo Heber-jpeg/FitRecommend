@@ -8,9 +8,10 @@
 
 
 const express = require("express");
-const router = express.Router();
+const router  = express.Router();
 const { generateRoutine } = require("../controllers/chat.controller");
+const { verificarToken }  = require("../middleware/auth.middleware");
 
-router.post("/chat", generateRoutine);
+router.post("/chat", verificarToken, generateRoutine);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./css/Inicio.css";
+import { apiFetch } from "../utils/api";
 
 function Inicio() {
 
@@ -32,7 +33,7 @@ function Inicio() {
     const { nombre } = JSON.parse(perfil);
     setGuardando(prev => ({ ...prev, [rutina._id]: true }));
     try {
-      const res = await fetch("http://localhost:3000/api/guardar-global", {
+      const res = await apiFetch("/guardar-global", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rutinaGlobalId: rutina._id, nombreUsuario: nombre })

@@ -1,0 +1,149 @@
+.auth-bg {
+  min-height: 100vh;
+  background: #0F172A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 40px;
+  width: 420px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3B82F6;
+  margin: 0;
+  text-align: center;
+}
+
+.auth-icon {
+  font-size: 48px;
+  text-align: center;
+}
+
+.auth-card h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #F8FAFC;
+  margin: 0;
+  text-align: center;
+}
+
+.auth-sub {
+  color: #94A3B8;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
+}
+
+/* TABS */
+.auth-tabs {
+  display: flex;
+  background: #0F172A;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: #1E293B;
+  color: #F8FAFC;
+}
+
+/* FORM */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-campo label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #94A3B8;
+}
+
+.auth-campo input {
+  background: #0F172A;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #F8FAFC;
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.auth-campo input:focus {
+  border-color: #3B82F6;
+  outline: none;
+}
+
+.auth-campo input::placeholder {
+  color: #334155;
+}
+
+/* ERROR */
+.auth-error {
+  background: #2D1A1A;
+  border: 1px solid #7F1D1D;
+  border-radius: 8px;
+  color: #F87171;
+  font-size: 13px;
+  padding: 10px 14px;
+  margin: 0;
+}
+
+/* BOTÓN */
+.auth-btn {
+  background: #3B82F6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-btn:hover {
+  background: #2563EB;
+  transform: translateY(-1px);
+}
+
+.auth-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
