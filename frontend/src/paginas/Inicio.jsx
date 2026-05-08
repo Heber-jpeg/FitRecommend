@@ -4,17 +4,22 @@ import { apiFetch } from "../utils/api";
 
 function Inicio() {
 
-  const [rutinas, setRutinas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [rutinas, setRutinas]   = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(false);
   const [guardando, setGuardando] = useState({});
-  const [guardado, setGuardado] = useState({});
-  const [rutinaVista, setRutinaVista] = useState(null); // ← modal
+  const [guardado, setGuardado]   = useState({});
+  const [rutinaVista, setRutinaVista] = useState(null);
 
-  const [filtroObjetivo, setFiltroObjetivo] = useState("todos");
-  const [filtroNivel, setFiltroNivel] = useState("todos");
+  const [filtroObjetivo,     setFiltroObjetivo]     = useState("todos");
+  const [filtroNivel,        setFiltroNivel]        = useState("todos");
   const [filtroEquipamiento, setFiltroEquipamiento] = useState("todos");
-  const [busqueda, setBusqueda] = useState("");
+  const [busqueda,           setBusqueda]           = useState("");
+
+  const usuario = (() => {
+    const u = localStorage.getItem("usuario");
+    return u ? JSON.parse(u) : null;
+  })();
 
   useEffect(() => {
     fetch("http://localhost:3000/api/globales")
@@ -25,18 +30,11 @@ function Inicio() {
   }, []);
 
   const handleGuardar = async (rutina) => {
-    const perfil = localStorage.getItem("perfil");
-    if (!perfil) {
-      alert("Primero completa tu perfil para guardar rutinas");
-      return;
-    }
-    const { nombre } = JSON.parse(perfil);
     setGuardando(prev => ({ ...prev, [rutina._id]: true }));
     try {
-      const res = await apiFetch("/guardar-global", { 
+      const res = await apiFetch("/guardar-global", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rutinaGlobalId: rutina._id, nombreUsuario: nombre })
+        body: JSON.stringify({ rutinaGlobalId: rutina._id })
       });
       if (!res.ok) throw new Error();
       setGuardado(prev => ({ ...prev, [rutina._id]: true }));
@@ -80,7 +78,6 @@ function Inicio() {
     filtroEquipamiento !== "todos" ||
     busqueda !== "";
 
-  // Agrupar ejercicios únicos por título
   const agruparEjercicios = (rutina) => {
     const grupos = {};
     rutina?.forEach((dia) => {
@@ -93,23 +90,62 @@ function Inicio() {
   return (
     <div className="inicio-container">
 
+      {/* HERO */}
       <div className="inicio-hero">
-        <h1>Bienvenido a <span>FitRecommend</span> 💪</h1>
-        <p>Rutinas personalizadas generadas con IA. Explora lo que la comunidad está entrenando.</p>
+        <div className="inicio-hero-texto">
+          <p className="inicio-saludo">
+            👋 Bienvenido, <span>{usuario?.username ?? "atleta"}</span>
+          </p>
+          <h1>Descubre rutinas de la <span>comunidad</span></h1>
+          <p className="inicio-hero-sub">
+            Rutinas generadas con IA, compartidas por atletas como tú.
+            Guárdalas y úsalas en tu calendario.
+          </p>
+        </div>
+        <div className="inicio-hero-stats">
+          <div className="inicio-stat">
+            <span className="inicio-stat-num">{rutinas.length}</span>
+            <span className="inicio-stat-label">Rutinas compartidas</span>
+          </div>
+          <div className="inicio-stat">
+            <span className="inicio-stat-num">
+              {[...new Set(rutinas.map(r => r.autor))].length}
+            </span>
+            <span className="inicio-stat-label">Atletas activos</span>
+          </div>
+        </div>
       </div>
 
       <div className="inicio-blog">
 
-        <h2>Rutinas de la comunidad</h2>
+        <div className="inicio-blog-header">
+          <h2>Rutinas de la comunidad</h2>
+          {!loading && !error && (
+            <span className="inicio-resultado">
+              {rutinasFiltradas.length} resultado{rutinasFiltradas.length !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
 
+        {/* FILTROS */}
         <div className="inicio-filtros">
-          <input
-            className="inicio-busqueda"
-            type="text"
-            placeholder="🔍 Buscar por autor o descripción..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
+          <div className="inicio-busqueda-wrap">
+            <span className="inicio-busqueda-icon">🔍</span>
+            <input
+              className="inicio-busqueda"
+              type="text"
+              placeholder="Buscar por autor o descripción..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+            {busqueda && (
+              <button
+                className="inicio-busqueda-clear"
+                onClick={() => setBusqueda("")}
+              >✕</button>
+            )}
+          </div>
+
           <div className="inicio-filtros-row">
             <select className="inicio-select" value={filtroObjetivo} onChange={(e) => setFiltroObjetivo(e.target.value)}>
               <option value="todos">🎯 Todos los objetivos</option>
@@ -132,87 +168,135 @@ function Inicio() {
               <option value="calistenia">Calistenia</option>
             </select>
             {hayFiltros && (
-              <button className="inicio-limpiar" onClick={limpiarFiltros}>✕ Limpiar</button>
+              <button className="inicio-limpiar" onClick={limpiarFiltros}>
+                ✕ Limpiar
+              </button>
             )}
           </div>
         </div>
 
-        {loading && <div className="inicio-empty"><span>⏳</span><p>Cargando rutinas...</p></div>}
-        {!loading && error && <div className="inicio-empty"><span>⚠️</span><p>No se pudieron cargar las rutinas.</p></div>}
+        {/* SKELETON LOADER */}
+        {loading && (
+          <div className="inicio-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="inicio-skeleton">
+                <div className="skeleton-top">
+                  <div className="skeleton-avatar" />
+                  <div className="skeleton-lines">
+                    <div className="skeleton-line w-60" />
+                    <div className="skeleton-line w-40" />
+                  </div>
+                </div>
+                <div className="skeleton-line w-100" />
+                <div className="skeleton-line w-80" />
+                <div className="skeleton-badges">
+                  <div className="skeleton-badge" />
+                  <div className="skeleton-badge" />
+                </div>
+                <div className="skeleton-btn" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="inicio-empty">
+            <span>⚠️</span>
+            <h3>Error al cargar</h3>
+            <p>No se pudieron cargar las rutinas. Verifica tu conexión.</p>
+            <button
+              className="inicio-limpiar-empty"
+              onClick={() => window.location.reload()}
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
 
         {!loading && !error && rutinasFiltradas.length === 0 && (
           <div className="inicio-empty">
-            <span>🔍</span>
-            <p>{hayFiltros ? "No hay rutinas que coincidan con los filtros." : "Aún no hay rutinas compartidas. ¡Sé el primero!"}</p>
-            {hayFiltros && <button className="inicio-limpiar-empty" onClick={limpiarFiltros}>Limpiar filtros</button>}
+            <span>{hayFiltros ? "🔍" : "🏋️"}</span>
+            <h3>{hayFiltros ? "Sin resultados" : "Sin rutinas aún"}</h3>
+            <p>
+              {hayFiltros
+                ? "Ninguna rutina coincide con los filtros seleccionados."
+                : "Aún no hay rutinas compartidas. ¡Sé el primero!"}
+            </p>
+            {hayFiltros && (
+              <button className="inicio-limpiar-empty" onClick={limpiarFiltros}>
+                Limpiar filtros
+              </button>
+            )}
           </div>
         )}
 
         {!loading && !error && rutinasFiltradas.length > 0 && (
-          <>
-            <p className="inicio-resultado">
-              {rutinasFiltradas.length} rutina{rutinasFiltradas.length !== 1 ? "s" : ""} encontrada{rutinasFiltradas.length !== 1 ? "s" : ""}
-            </p>
-
-            <div className="inicio-grid">
-              {rutinasFiltradas.map((r) => (
-                <div key={r._id} className="inicio-card">
-
-                  <div className="inicio-card-top">
-                    <div className="inicio-avatar">
-                      {r.autor?.charAt(0).toUpperCase() ?? "?"}
-                    </div>
-                    <div>
-                      <span className="inicio-autor">{r.autor ?? "Anónimo"}</span>
-                      <span className="inicio-fecha">{r.creadoEn ? formatFecha(r.creadoEn) : ""}</span>
-                    </div>
+          <div className="inicio-grid">
+            {rutinasFiltradas.map((r, idx) => (
+              <div
+                key={r._id}
+                className="inicio-card"
+                style={{ animationDelay: `${idx * 0.05}s` }}
+              >
+                <div className="inicio-card-top">
+                  <div className="inicio-avatar">
+                    {r.autor?.charAt(0).toUpperCase() ?? "?"}
                   </div>
-
-                  <p className="inicio-descripcion">{r.descripcion ?? ""}</p>
-
-                  <div className="inicio-badges">
-                    <span className="inicio-badge">{objetivoLabel[r.objetivo] ?? r.objetivo ?? ""}</span>
-                    <span className="inicio-badge nivel">{r.nivel ?? ""}</span>
+                  <div>
+                    <span className="inicio-autor">{r.autor ?? "Anónimo"}</span>
+                    <span className="inicio-fecha">
+                      {r.creadoEn ? formatFecha(r.creadoEn) : ""}
+                    </span>
                   </div>
-
-                  <div className="inicio-detalles">
-                    <span>⏱ {r.opciones?.descanso ?? "-"}s</span>
-                    <span>🕐 {r.opciones?.duracion ?? "-"} min</span>
-                    <span>🔥 {r.opciones?.intensidad ?? "-"}</span>
-                    <span>🏋️ {r.opciones?.equipamiento ?? "-"}</span>
-                  </div>
-
-                  {/* BOTONES */}
-                  <div className="inicio-card-acciones">
-                    <button
-                      className="inicio-btn-ver"
-                      onClick={() => setRutinaVista(r)}
-                    >
-                      👁 Ver rutina
-                    </button>
-
-                    {guardado[r._id] ? (
-                      <p className="inicio-guardado">✅ Guardada</p>
-                    ) : (
-                      <button
-                        className="inicio-btn-guardar"
-                        onClick={() => handleGuardar(r)}
-                        disabled={guardando[r._id]}
-                      >
-                        {guardando[r._id] ? "Guardando..." : "💾 Guardar"}
-                      </button>
-                    )}
-                  </div>
-
                 </div>
-              ))}
-            </div>
-          </>
+
+                <p className="inicio-descripcion">{r.descripcion ?? ""}</p>
+
+                <div className="inicio-badges">
+                  <span className="inicio-badge">
+                    {objetivoLabel[r.objetivo] ?? r.objetivo ?? ""}
+                  </span>
+                  <span className="inicio-badge nivel">{r.nivel ?? ""}</span>
+                </div>
+
+                <div className="inicio-detalles">
+                  <span>⏱ {r.opciones?.descanso ?? "-"}s</span>
+                  <span>🕐 {r.opciones?.duracion ?? "-"} min</span>
+                  <span>🔥 {r.opciones?.intensidad ?? "-"}</span>
+                  <span>🏋️ {r.opciones?.equipamiento ?? "-"}</span>
+                </div>
+
+                <div className="inicio-card-acciones">
+                  <button
+                    className="inicio-btn-ver"
+                    onClick={() => setRutinaVista(r)}
+                  >
+                    👁 Ver rutina
+                  </button>
+
+                  {guardado[r._id] ? (
+                    <span className="inicio-guardado">✅ Guardada</span>
+                  ) : (
+                    <button
+                      className="inicio-btn-guardar"
+                      onClick={() => handleGuardar(r)}
+                      disabled={guardando[r._id]}
+                    >
+                      {guardando[r._id]
+                        ? <span className="inicio-btn-spinner" />
+                        : "💾 Guardar"}
+                    </button>
+                  )}
+                </div>
+
+              </div>
+            ))}
+          </div>
         )}
 
       </div>
 
-      {/* MODAL VER RUTINA */}
+      {/* MODAL */}
       {rutinaVista && (
         <div className="inicio-modal-overlay" onClick={() => setRutinaVista(null)}>
           <div className="inicio-modal" onClick={(e) => e.stopPropagation()}>
@@ -222,11 +306,16 @@ function Inicio() {
                 <h3>Rutina de {rutinaVista.autor}</h3>
                 <span className="inicio-modal-sub">{rutinaVista.descripcion}</span>
               </div>
-              <button className="inicio-modal-close" onClick={() => setRutinaVista(null)}>✕</button>
+              <button
+                className="inicio-modal-close"
+                onClick={() => setRutinaVista(null)}
+              >✕</button>
             </div>
 
             <div className="inicio-modal-badges">
-              <span className="inicio-badge">{objetivoLabel[rutinaVista.objetivo] || rutinaVista.objetivo}</span>
+              <span className="inicio-badge">
+                {objetivoLabel[rutinaVista.objetivo] || rutinaVista.objetivo}
+              </span>
               <span className="inicio-badge nivel">{rutinaVista.nivel}</span>
               <span className="inicio-badge">⏱ {rutinaVista.opciones?.descanso}s</span>
               <span className="inicio-badge">🕐 {rutinaVista.opciones?.duracion} min</span>
