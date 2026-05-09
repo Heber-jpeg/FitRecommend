@@ -3,141 +3,180 @@ import { useState, useEffect } from "react";
 
 function Perfil({ onGuardado }) {
 
-  const [nombre, setNombre] = useState("");
-  const [edad, setEdad] = useState("");
-  const [peso, setPeso] = useState("");
-  const [altura, setAltura] = useState("");
-  const [objetivo, setObjetivo] = useState("");
-  const [nivel, setNivel] = useState("");
-  const [dias, setDias] = useState("");
-  const [lesiones, setLesiones] = useState("");
-  const [guardado, setGuardado] = useState(false);
+  const [form, setForm] = useState({
+    nombre:   "",
+    edad:     "",
+    peso:     "",
+    altura:   "",
+    objetivo: "",
+    nivel:    "",
+    dias:     "",
+    lesiones: ""
+  });
+
+  const [guardado, setGuardado]   = useState(false);
+  const [guardando, setGuardando] = useState(false);
+  const [exito, setExito]         = useState(false);
 
   useEffect(() => {
     const perfilGuardado = localStorage.getItem("perfil");
     if (perfilGuardado) {
       const datos = JSON.parse(perfilGuardado);
-      setNombre(datos.nombre || "");
-      setEdad(datos.edad || "");
-      setPeso(datos.peso || "");
-      setAltura(datos.altura || "");
-      setObjetivo(datos.objetivo || "");
-      setNivel(datos.nivel || "");
-      setDias(datos.dias || "");
-      setLesiones(datos.lesiones || "");
+      setForm({
+        nombre:   datos.nombre   || "",
+        edad:     datos.edad     || "",
+        peso:     datos.peso     || "",
+        altura:   datos.altura   || "",
+        objetivo: datos.objetivo || "",
+        nivel:    datos.nivel    || "",
+        dias:     datos.dias     || "",
+        lesiones: datos.lesiones || ""
+      });
       setGuardado(true);
     }
   }, []);
+
+  const handleChange = (e) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (guardado) {
       setGuardado(false);
+      setExito(false);
       return;
     }
 
+    setGuardando(true);
+
     const perfil = {
-      nombre,
-      edad,
-      peso,
-      altura,
-      objetivo,
-      nivel,
-      dias,
-      lesiones,
+      ...form,
       fechaInicio: new Date().toISOString().split("T")[0]
     };
 
     localStorage.setItem("perfil", JSON.stringify(perfil));
-    setGuardado(true);
 
-    // ✅ Avisar al padre que se guardó
-    if (onGuardado) onGuardado(perfil);
+    setTimeout(() => {
+      setGuardado(true);
+      setGuardando(false);
+      setExito(true);
+      setTimeout(() => setExito(false), 3000);
+      if (onGuardado) onGuardado(perfil);
+    }, 400);
   };
+
+  const campos = [
+    { name: "nombre",  label: "Nombre completo",  type: "text",   placeholder: "Tu nombre",   icon: "👤" },
+    { name: "edad",    label: "Edad",              type: "number", placeholder: "Años",         icon: "🎂" },
+    { name: "peso",    label: "Peso",              type: "number", placeholder: "kg",           icon: "⚖️" },
+    { name: "altura",  label: "Altura",            type: "number", placeholder: "cm",           icon: "📏" },
+    { name: "dias",    label: "Días por semana",   type: "number", placeholder: "1 - 7",        icon: "📆", min: "1", max: "7" },
+    { name: "lesiones",label: "Lesiones",          type: "text",   placeholder: "Ninguna",      icon: "🩹", required: false },
+  ];
 
   return (
     <div className="perfil-container">
-      <h2>Completa tu perfil</h2>
+
+      <div className="perfil-titulo">
+        <h2>{guardado ? "Tu perfil" : "Completa tu perfil"}</h2>
+        <p className="perfil-sub">
+          {guardado
+            ? "Tus datos se usan para personalizar tu rutina"
+            : "Necesitamos estos datos para generar tu rutina perfecta"}
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="perfil-form">
 
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          disabled={guardado}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Edad"
-          value={edad}
-          onChange={(e) => setEdad(e.target.value)}
-          disabled={guardado}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Peso (kg)"
-          value={peso}
-          onChange={(e) => setPeso(e.target.value)}
-          disabled={guardado}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Altura (cm)"
-          value={altura}
-          onChange={(e) => setAltura(e.target.value)}
-          disabled={guardado}
-          required
-        />
+        {/* CAMPOS DE TEXTO Y NÚMERO */}
+        <div className="perfil-grid">
+          {campos.map((campo) => (
+            <div key={campo.name} className="perfil-campo">
+              <label>
+                <span className="perfil-campo-icon">{campo.icon}</span>
+                {campo.label}
+              </label>
+              <input
+                type={campo.type}
+                name={campo.name}
+                placeholder={campo.placeholder}
+                value={form[campo.name]}
+                onChange={handleChange}
+                disabled={guardado}
+                required={campo.required !== false}
+                min={campo.min}
+                max={campo.max}
+              />
+            </div>
+          ))}
+        </div>
 
-        <select
-          value={objetivo}
-          onChange={(e) => setObjetivo(e.target.value)}
-          disabled={guardado}
-          required
+        {/* SELECTS */}
+        <div className="perfil-selects">
+
+          <div className="perfil-campo">
+            <label><span className="perfil-campo-icon">🎯</span> Objetivo</label>
+            <div className="perfil-opciones">
+              {[
+                { value: "musculo",      label: "Ganar músculo",  icon: "💪" },
+                { value: "perder_grasa", label: "Perder grasa",   icon: "🔥" },
+                { value: "resistencia",  label: "Resistencia",    icon: "🏃" },
+              ].map((op) => (
+                <button
+                  key={op.value}
+                  type="button"
+                  className={`perfil-opcion ${form.objetivo === op.value ? "selected" : ""}`}
+                  onClick={() => !guardado && setForm(prev => ({ ...prev, objetivo: op.value }))}
+                  disabled={guardado}
+                >
+                  <span>{op.icon}</span>
+                  <span>{op.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="perfil-campo">
+            <label><span className="perfil-campo-icon">📊</span> Nivel</label>
+            <div className="perfil-opciones">
+              {[
+                { value: "principiante", label: "Principiante", icon: "🌱" },
+                { value: "intermedio",   label: "Intermedio",   icon: "⚡" },
+                { value: "avanzado",     label: "Avanzado",     icon: "🏆" },
+              ].map((op) => (
+                <button
+                  key={op.value}
+                  type="button"
+                  className={`perfil-opcion ${form.nivel === op.value ? "selected" : ""}`}
+                  onClick={() => !guardado && setForm(prev => ({ ...prev, nivel: op.value }))}
+                  disabled={guardado}
+                >
+                  <span>{op.icon}</span>
+                  <span>{op.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* MENSAJE ÉXITO */}
+        {exito && (
+          <div className="perfil-exito">
+            ✅ Perfil guardado correctamente
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className={`perfil-btn ${guardado ? "perfil-btn-editar" : ""}`}
+          disabled={guardando}
         >
-          <option value="">Selecciona tu objetivo</option>
-          <option value="musculo">Ganar músculo</option>
-          <option value="perder_grasa">Perder grasa</option>
-          <option value="resistencia">Resistencia</option>
-        </select>
-
-        <select
-          value={nivel}
-          onChange={(e) => setNivel(e.target.value)}
-          disabled={guardado}
-          required
-        >
-          <option value="">Nivel</option>
-          <option value="principiante">Principiante</option>
-          <option value="intermedio">Intermedio</option>
-          <option value="avanzado">Avanzado</option>
-        </select>
-
-        <input
-          type="number"
-          placeholder="Días disponibles por semana"
-          value={dias}
-          onChange={(e) => setDias(e.target.value)}
-          disabled={guardado}
-          min="1"
-          max="7"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Lesiones o limitaciones"
-          value={lesiones}
-          onChange={(e) => setLesiones(e.target.value)}
-          disabled={guardado}
-        />
-
-        <button type="submit">
-          {guardado ? "Editar perfil" : "Guardar perfil"}
+          {guardando
+            ? <><span className="perfil-spinner" /> Guardando...</>
+            : guardado ? "✏️ Editar perfil" : "💾 Guardar perfil"}
         </button>
 
       </form>

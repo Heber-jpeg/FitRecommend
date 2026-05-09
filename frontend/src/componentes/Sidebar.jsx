@@ -15,11 +15,10 @@ function Sidebar({ perfilData, onAbrirPerfil }) {
     navigate("/login");
   };
 
-
   const objetivoLabel = {
-    musculo: "Ganar músculo",
+    musculo:      "Ganar músculo",
     perder_grasa: "Perder grasa",
-    resistencia: "Resistencia"
+    resistencia:  "Resistencia"
   };
 
   const links = [
@@ -29,9 +28,15 @@ function Sidebar({ perfilData, onAbrirPerfil }) {
     { path: "/mis-rutinas", icon: "📋", label: "Mis rutinas" },
   ];
 
+  const usuario = (() => {
+    const u = localStorage.getItem("usuario");
+    return u ? JSON.parse(u) : null;
+  })();
+
   return (
     <aside className="sidebar">
 
+      {/* PERFIL */}
       {perfilData ? (
         <div className="sidebar-perfil-card" onClick={onAbrirPerfil}>
           <div className="sidebar-perfil-avatar">
@@ -47,31 +52,41 @@ function Sidebar({ perfilData, onAbrirPerfil }) {
           <span className="sidebar-perfil-edit">✏️</span>
         </div>
       ) : (
-        <div className="sidebar-perfil-card sidebar-perfil-vacio" onClick={onAbrirPerfil}>
-          <span>👤 Completa tu perfil</span>
+        <div
+          className="sidebar-perfil-card sidebar-perfil-vacio"
+          onClick={onAbrirPerfil}
+        >
+          <div className="sidebar-perfil-avatar sidebar-perfil-avatar-vacio">
+            {usuario?.username?.charAt(0).toUpperCase() ?? "?"}
+          </div>
+          <div className="sidebar-perfil-info">
+            <span className="sidebar-perfil-nombre">
+              {usuario?.username ?? "Usuario"}
+            </span>
+            <span className="sidebar-perfil-completar">Completar perfil →</span>
+          </div>
         </div>
       )}
 
       <div className="sidebar-divider" />
 
-      <h3 className="sidebar-seccion">Navegación</h3>
+      {/* NAVEGACIÓN */}
+      <p className="sidebar-seccion">Navegación</p>
 
-      {links.map((link) => (
-        <button
-          key={link.path}
-          className={`sidebar-btn ${location.pathname === link.path ? "active" : ""}`}
-          onClick={() => navigate(link.path)}
-        >
-          {link.icon} {link.label}
-        </button>
-      ))}
-
-      <div className="sidebar-divider" />
-
-    
-      <button className="sidebar-btn danger" onClick={handleLogout}>
-        🚪 Cerrar sesión
-      </button>
+      {links.map((link) => {
+        const activo = location.pathname === link.path;
+        return (
+          <button
+            key={link.path}
+            className={`sidebar-btn ${activo ? "active" : ""}`}
+            onClick={() => navigate(link.path)}
+          >
+            <span className="sidebar-btn-icon">{link.icon}</span>
+            <span className="sidebar-btn-label">{link.label}</span>
+            {activo && <span className="sidebar-btn-dot" />}
+          </button>
+        );
+      })}
 
     </aside>
   );
