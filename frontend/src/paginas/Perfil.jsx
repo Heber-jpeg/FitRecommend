@@ -1,5 +1,6 @@
 import "../paginas/css/Perfil.css";
 import { useState, useEffect } from "react";
+import { apiFetch } from "../utils/api";
 
 function Perfil({ onGuardado }) {
 
@@ -17,30 +18,75 @@ function Perfil({ onGuardado }) {
   const [guardado, setGuardado]   = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [exito, setExito]         = useState(false);
+  const [cargando, setCargando]   = useState(true);
 
   useEffect(() => {
-    const perfilGuardado = localStorage.getItem("perfil");
-    if (perfilGuardado) {
-      const datos = JSON.parse(perfilGuardado);
-      setForm({
-        nombre:   datos.nombre   || "",
-        edad:     datos.edad     || "",
-        peso:     datos.peso     || "",
-        altura:   datos.altura   || "",
-        objetivo: datos.objetivo || "",
-        nivel:    datos.nivel    || "",
-        dias:     datos.dias     || "",
-        lesiones: datos.lesiones || ""
-      });
-      setGuardado(true);
-    }
+    // Primero intenta cargar desde la BD
+    apiFetch("/auth/perfil")
+      .then(r => r.json())
+      .then(data => {
+        if (data.perfil) {
+          const d = data.perfil;
+          const perfil = {
+            nombre:      d.nombre      || "",
+            edad:        d.edad        || "",
+            peso:        d.peso        || "",
+            altura:      d.altura      || "",
+            objetivo:    d.objetivo    || "",
+            nivel:       d.nivel       || "",
+            dias:        d.dias        || "",
+            lesiones:    d.lesiones    || "",
+            fechaInicio: d.fechaInicio || ""
+          };
+          setForm(perfil);
+          // Sincroniza localStorage también
+          localStorage.setItem("perfil", JSON.stringify(perfil));
+          setGuardado(true);
+        } else {
+          // Si no hay en BD, intenta localStorage como fallback
+          const local = localStorage.getItem("perfil");
+          if (local) {
+            const d = JSON.parse(local);
+            setForm({
+              nombre:   d.nombre   || "",
+              edad:     d.edad     || "",
+              peso:     d.peso     || "",
+              altura:   d.altura   || "",
+              objetivo: d.objetivo || "",
+              nivel:    d.nivel    || "",
+              dias:     d.dias     || "",
+              lesiones: d.lesiones || ""
+            });
+            setGuardado(true);
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback a localStorage si falla la BD
+        const local = localStorage.getItem("perfil");
+        if (local) {
+          const d = JSON.parse(local);
+          setForm({
+            nombre:   d.nombre   || "",
+            edad:     d.edad     || "",
+            peso:     d.peso     || "",
+            altura:   d.altura   || "",
+            objetivo: d.objetivo || "",
+            nivel:    d.nivel    || "",
+            dias:     d.dias     || "",
+            lesiones: d.lesiones || ""
+          });
+          setGuardado(true);
+        }
+      })
+      .finally(() => setCargando(false));
   }, []);
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (guardado) {
@@ -56,15 +102,26 @@ function Perfil({ onGuardado }) {
       fechaInicio: new Date().toISOString().split("T")[0]
     };
 
-    localStorage.setItem("perfil", JSON.stringify(perfil));
+    try {
+      // Guarda en BD
+      await apiFetch("/auth/perfil", {
+        method: "POST",
+        body:   JSON.stringify(perfil)
+      });
 
-    setTimeout(() => {
+      // Sincroniza localStorage
+      localStorage.setItem("perfil", JSON.stringify(perfil));
+
       setGuardado(true);
-      setGuardando(false);
       setExito(true);
       setTimeout(() => setExito(false), 3000);
       if (onGuardado) onGuardado(perfil);
-    }, 400);
+
+    } catch {
+      alert("Error guardando el perfil");
+    } finally {
+      setGuardando(false);
+    }
   };
 
   const campos = [
@@ -75,6 +132,14 @@ function Perfil({ onGuardado }) {
     { name: "dias",     label: "Días por semana", type: "number", placeholder: "1 - 7",     icon: "📆", min: "1",  max: "7"   },
     { name: "lesiones", label: "Lesiones",        type: "text",   placeholder: "Ninguna",   icon: "🩹", required: false },
   ];
+
+  if (cargando) return (
+    <div className="perfil-container">
+      <div className="perfil-titulo">
+        <h2>Cargando perfil...</h2>
+      </div>
+    </div>
+  );
 
   return (
     <div className="perfil-container">
@@ -90,7 +155,6 @@ function Perfil({ onGuardado }) {
 
       <form onSubmit={handleSubmit} className="perfil-form">
 
-        {/* CAMPOS DE TEXTO Y NÚMERO */}
         <div className="perfil-grid">
           {campos.map((campo) => (
             <div key={campo.name} className="perfil-campo">
@@ -118,16 +182,15 @@ function Perfil({ onGuardado }) {
           ))}
         </div>
 
-        {/* SELECTS */}
         <div className="perfil-selects">
 
           <div className="perfil-campo">
             <label><span className="perfil-campo-icon">🎯</span> Objetivo</label>
             <div className="perfil-opciones">
               {[
-                { value: "musculo",      label: "Ganar músculo",  icon: "💪" },
-                { value: "perder_grasa", label: "Perder grasa",   icon: "🔥" },
-                { value: "resistencia",  label: "Resistencia",    icon: "🏃" },
+                { value: "musculo",      label: "Ganar músculo", icon: "💪" },
+                { value: "perder_grasa", label: "Perder grasa",  icon: "🔥" },
+                { value: "resistencia",  label: "Resistencia",   icon: "🏃" },
               ].map((op) => (
                 <button
                   key={op.value}
@@ -167,7 +230,6 @@ function Perfil({ onGuardado }) {
 
         </div>
 
-        {/* MENSAJE ÉXITO */}
         {exito && (
           <div className="perfil-exito">
             ✅ Perfil guardado correctamente

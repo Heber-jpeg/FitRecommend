@@ -13,9 +13,9 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
-    localStorage.removeItem("perfil");
     localStorage.removeItem("rutinaCalendario");
     localStorage.removeItem("rutinaGenerada");
+    // ← perfil ya NO se borra, se recarga desde BD al login
     navigate("/login");
   };
 

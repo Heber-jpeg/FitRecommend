@@ -13,10 +13,10 @@ function Login() {
     password: ""
   });
 
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState("");
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState("");
   const [mostrarPass, setMostrarPass] = useState(false);
-  const [errores, setErrores]       = useState({});
+  const [errores, setErrores]         = useState({});
 
   const validarCampo = (name, value) => {
     const nuevosErrores = { ...errores };
@@ -54,6 +54,20 @@ function Login() {
     setForm({ username: "", correo: "", password: "" });
   };
 
+  const cargarPerfil = async (token) => {
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/perfil", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.perfil) {
+        localStorage.setItem("perfil", JSON.stringify(data.perfil));
+      }
+    } catch {
+      // Si falla no es crítico, el perfil se cargará luego
+    }
+  };
+
   const handleLogin = async () => {
     if (!form.correo || !form.password) {
       setError("Todos los campos son obligatorios");
@@ -73,6 +87,10 @@ function Login() {
 
       localStorage.setItem("token",   data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+
+      // Carga el perfil desde BD automáticamente
+      await cargarPerfil(data.token);
+
       navigate("/");
 
     } catch {
@@ -151,7 +169,6 @@ function Login() {
   return (
     <div className="auth-bg">
 
-      {/* FONDO DECORATIVO */}
       <div className="auth-decoracion">
         <div className="auth-circulo auth-circulo-1" />
         <div className="auth-circulo auth-circulo-2" />
@@ -159,7 +176,6 @@ function Login() {
 
       <div className="auth-card">
 
-        {/* LOGO */}
         <div className="auth-logo-wrap">
           <span className="auth-logo-icono">💪</span>
           <h1 className="auth-logo">FitRecommend</h1>
@@ -170,7 +186,6 @@ function Login() {
           </p>
         </div>
 
-        {/* TABS */}
         <div className="auth-tabs">
           <button
             className={`auth-tab ${modo === "login" ? "active" : ""}`}
@@ -186,7 +201,6 @@ function Login() {
           </button>
         </div>
 
-        {/* FORMULARIO */}
         <div className="auth-form" onKeyDown={handleKeyDown}>
 
           {modo === "registro" && (
@@ -254,7 +268,7 @@ function Login() {
                   form.password.length >= 6  ? "media"  : "debil"
                 }`} />
                 <span className="auth-pass-label">
-                  {form.password.length >= 10 ? "Contraseña fuerte" :
+                  {form.password.length >= 10 ? "Contraseña fuerte"    :
                    form.password.length >= 6  ? "Contraseña aceptable" :
                    "Contraseña débil"}
                 </span>
