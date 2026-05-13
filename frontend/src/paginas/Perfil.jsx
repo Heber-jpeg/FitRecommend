@@ -68,12 +68,12 @@ function Perfil({ onGuardado }) {
   };
 
   const campos = [
-    { name: "nombre",  label: "Nombre completo",  type: "text",   placeholder: "Tu nombre",   icon: "👤" },
-    { name: "edad",    label: "Edad",              type: "number", placeholder: "Años",         icon: "🎂" },
-    { name: "peso",    label: "Peso",              type: "number", placeholder: "kg",           icon: "⚖️" },
-    { name: "altura",  label: "Altura",            type: "number", placeholder: "cm",           icon: "📏" },
-    { name: "dias",    label: "Días por semana",   type: "number", placeholder: "1 - 7",        icon: "📆", min: "1", max: "7" },
-    { name: "lesiones",label: "Lesiones",          type: "text",   placeholder: "Ninguna",      icon: "🩹", required: false },
+    { name: "nombre",   label: "Nombre completo", type: "text",   placeholder: "Tu nombre", icon: "👤" },
+    { name: "edad",     label: "Edad",            type: "number", placeholder: "Años",      icon: "🎂", min: "1",  max: "120" },
+    { name: "peso",     label: "Peso",            type: "number", placeholder: "kg",        icon: "⚖️", min: "1",  max: "300" },
+    { name: "altura",   label: "Altura",          type: "number", placeholder: "cm",        icon: "📏", min: "50", max: "250" },
+    { name: "dias",     label: "Días por semana", type: "number", placeholder: "1 - 7",     icon: "📆", min: "1",  max: "7"   },
+    { name: "lesiones", label: "Lesiones",        type: "text",   placeholder: "Ninguna",   icon: "🩹", required: false },
   ];
 
   return (
@@ -108,6 +108,11 @@ function Perfil({ onGuardado }) {
                 required={campo.required !== false}
                 min={campo.min}
                 max={campo.max}
+                onKeyDown={(e) => {
+                  if (campo.type === "number" && ["-", "+", "e", "E"].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
               />
             </div>
           ))}
